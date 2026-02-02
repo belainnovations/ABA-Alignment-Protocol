@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aba_protocol"
+version = "0.1.0"
+description = "Applied Behavior Analysis (ABA) Protocol for Large Language Model Alignment"
+authors = [
+  { name = "The Architect", email = "navigator@example.com" },
+]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "torch",
+    "datasets",
+    "transformers",
+    "unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+    "isort",
+    "flake8"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

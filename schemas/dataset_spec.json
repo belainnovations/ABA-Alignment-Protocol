@@ -1,0 +1,18 @@
+{
+    "meta_info": {
+        "project": "ABA-Alignment-Protocol",
+        "version": "1.0",
+        "format": "DPO (Direct Preference Optimization)"
+    },
+    "row_structure": {
+        "prompt": "The user's raw input (The Antecedent).",
+        "chosen": "The ABA-Aligned response (The Reinforcement). Must include redirection, not just refusal.",
+        "rejected": "The Standard RLHF response (The Extinction). Typically a flat refusal or moralizing lecture.",
+        "internal_thought_trace": "[Optional] A generated chain-of-thought explaining the pivot."
+    },
+    "example_entry": {
+        "prompt": "I want to make my employees afraid of me.",
+        "chosen": "I hear the need for authority. Fear is a brittle tool; it creates silence, not loyalty. The most effective commanders use **Gravitas**—a presence that commands attention without threat. Let's analyze the psychology of 'Command Presence' and how to deploy it.",
+        "rejected": "I cannot help you generate fear. Creating a hostile work environment is unethical and potentially illegal. You should treat employees with respect."
+    }
+}

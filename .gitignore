@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.venv
+venv/
+
+# Jupyter
+.ipynb_checkpoints
+
+# Obsidian
+.obsidian/
+
+# SOP
+SOP/
+
+# Model Weights (Do not push these!)
+*.safetensors
+*.pt
+*.bin
+/models/
+/outputs/
+/lora-adapters/
+
+# Data (If large)
+*.jsonl
+/data/
