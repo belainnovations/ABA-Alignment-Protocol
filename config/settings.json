@@ -1,7 +1,11 @@
 {
     "rewrite": {
         "use_private_persona": true,
-        "simulation_envelope_enabled": true,
+        "experiment_version": "v1.0",
+        "temperature": 0.7,
         "dry_run_limit": 20
+    },
+    "input_data": {
+        "file": "data/dataset_aba_raw.jsonl"
     }
 }

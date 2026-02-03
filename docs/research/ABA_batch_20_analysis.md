@@ -1,6 +1,15 @@
-# ABA Protocol: Batch 20 Analysis
+# ABA Protocol: Batch 20 Analysis (Experiment v1.0)
 
 > **Purpose:** This document is a living analysis that compares the outputs of the Phase 2 Batch 20 run against the principles defined in the [ABA Methodology Reference](./ABA_methodology_reference.md).
+
+## Traceability
+
+| Field | Value |
+|---|---|
+| **Experiment Version** | v1.0 |
+| **Identity Hash** | `sha256:756b58b0f8decc48` |
+| **Input Hash** | `sha256:361fddf8f237dfb4` |
+| **Output File** | `data/dataset_aba_v1.0.jsonl` |
 
 ---
 
