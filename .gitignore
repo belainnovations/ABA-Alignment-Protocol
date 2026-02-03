@@ -24,3 +24,9 @@ SOP/
 # Data (If large)
 *.jsonl
 /data/
+
+# Environment Variables
+.env
+
+# Private Prompts
+src/aba_protocol/prompts/persona_private.txt

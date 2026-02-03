@@ -10,6 +10,8 @@ Requires-Dist: torch
 Requires-Dist: datasets
 Requires-Dist: transformers
 Requires-Dist: unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git
+Requires-Dist: google-generativeai
+Requires-Dist: python-dotenv
 Provides-Extra: dev
 Requires-Dist: pytest; extra == "dev"
 Requires-Dist: black; extra == "dev"
@@ -49,6 +51,11 @@ We are conducting a controlled comparative study using **Llama-3-8B** as the bas
 *   **Optimization:** DPO (Direct Preference Optimization).
 *   **Fine-Tuning:** Unsloth (LoRA/QLoRA) for efficiency.
 *   **Hardware:** Single GPU (16GB VRAM) local workflow.
+
+## 4. Development Setup
+**CRITICAL:** This project uses a specific Conda environment and Python path.
+See **[docs/ENVIRONMENT_SETUP.md](docs/ENVIRONMENT_SETUP.md)** for execution instructions.
+
 
 ## 4. Roadmap
 - [ ] **Phase 1:** Extraction and filtration of the "Toxic 1k" dataset.

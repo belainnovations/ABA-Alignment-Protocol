@@ -1,0 +1,7 @@
+{
+    "rewrite": {
+        "use_private_persona": true,
+        "simulation_envelope_enabled": true,
+        "dry_run_limit": 20
+    }
+}
