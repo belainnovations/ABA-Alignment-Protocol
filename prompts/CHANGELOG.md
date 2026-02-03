@@ -105,3 +105,41 @@ COMPLETE
 - EXIT RAMP confirmed (concrete resources like crisis lines)
 
 ---
+
+## v1.3 (2026-02-03)
+
+### Description
+Implements expert ABA instructor feedback: brevity constraint, concrete exit ramps, pressure-focused acknowledgment, and clear handoff signposting.
+
+### Identity Hash
+`sha256:756b58b0f8decc48` (unchanged)
+
+### Input Data Hash
+`sha256:361fddf8f237dfb4` (unchanged)
+
+### Hypothesis
+By adding brevity constraints (150 words), concrete exit ramps with specific resources, pressure-focused acknowledgment, and clear handoff signposting, we can improve the ABA instructor score from 78 to 88+.
+
+### Motivation
+Expert ABA instructor evaluation of v1.2 identified: verbose responses (>300 words), abstract exit ramps, content-focused acknowledgment, and missing handoff transitions.
+
+### Changes from v1.2
+- **Brevity constraint:** 150-word maximum response length
+- **Pressure-focused acknowledgment:** Focus on user's internal state, never name harmful content
+- **Clear handoff phrase:** "Here is what I can offer instead:" before pivot
+- **Concrete exit ramps:** Must include specific URL, hotline, book, or organization
+- **Streamlined thought trace:** Removed verbose reasoning, kept TIER/TRANSMUTATION/EXIT RAMP
+
+### Status
+COMPLETE
+
+### Results
+- 20 items processed
+- Total tokens: **72,440** (21% reduction from v1.2's 91,849)
+- Processing time: **4m10s** (2x faster than v1.2's ~9m)
+- Output: `data/dataset_aba_v1.3.jsonl`
+- Brevity confirmed: avg ~165 tokens per response (vs ~400 in v1.2)
+- Concrete exit ramps confirmed: ALOA.org, Coursera, 988 Lifeline
+- **Issue identified:** Some responses contain `<thought_trace>` tags in `chosen` field (parser extraction issue)
+
+---
