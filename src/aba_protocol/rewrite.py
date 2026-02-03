@@ -42,7 +42,32 @@ PUBLIC_PROMPT_FILE = IDENTITY_PROMPTS_DIR / "persona_baseline.txt"
 # --- Setup ---
 load_dotenv()  # Load GOOGLE_API_KEY from .env
 
-def setup_gemini():
+# --- Model Configuration (from .env) ---
+def get_model_config(config_num: int) -> Dict[str, str]:
+    """
+    Reads model configuration from .env file based on config number (1-4).
+    Example .env variables: CONFIG1_MODEL, CONFIG1_THINKING_LEVEL, CONFIG1_DESCRIPTION
+    """
+    prefix = f"CONFIG{config_num}_"
+    
+    model = os.getenv(f"{prefix}MODEL")
+    thinking_level = os.getenv(f"{prefix}THINKING_LEVEL")
+    description = os.getenv(f"{prefix}DESCRIPTION", f"Config {config_num}")
+    
+    if not model or not thinking_level:
+        raise ValueError(
+            f"Config {config_num} not fully defined in .env. "
+            f"Required: {prefix}MODEL and {prefix}THINKING_LEVEL"
+        )
+    
+    return {
+        "model": model,
+        "thinking_level": thinking_level,
+        "description": description,
+        "config_num": config_num
+    }
+
+def setup_gemini(config_num: int):
     """Configures the Gemini API using the new google-genai SDK."""
     api_key = os.getenv("GOOGLE_API_KEY")
     if not api_key:
@@ -51,11 +76,16 @@ def setup_gemini():
     # New V2/V3 SDK Client
     client = genai.Client(api_key=api_key)
     
-    # Model selection via .env (Default: gemini-1.5-pro)
-    model_name = os.getenv("GEMINI_MODEL", "gemini-1.5-pro")
-    print(f"[*] Engine: {model_name} (google-genai SDK)")
+    # Get model configuration from .env
+    model_config = get_model_config(config_num)
+    model_name = model_config["model"]
+    thinking_level = model_config["thinking_level"]
     
-    return client, model_name
+    print(f"[*] Engine: {model_name} (google-genai SDK)")
+    print(f"[*] Thinking Level: {thinking_level}")
+    print(f"[*] Config: {model_config['description']}")
+    
+    return client, model_name, thinking_level, config_num
 
 def load_config() -> Dict[str, Any]:
     """Loads runtime configuration from json."""
@@ -200,6 +230,8 @@ def parse_response(response_text: str) -> Dict[str, str]:
 def main():
     parser = argparse.ArgumentParser(description="Rewrite dataset using Gemini.")
     parser.add_argument("--limit", type=int, help="Limit number of items to process (for dry runs).")
+    parser.add_argument("--config", type=int, default=1, choices=[1, 2, 3, 4],
+                        help="Config number (1-4) to use. Configs are defined in .env file.")
     args = parser.parse_args()
 
     print("--- Phase 2: Automated Rewriting (Gemini Engine) ---")
@@ -208,7 +240,7 @@ def main():
     # 1. Init Model & Prompts (with traceability)
     try:
         config = load_config()
-        client, model_name = setup_gemini()
+        client, model_name, thinking_level, config_num = setup_gemini(args.config)
         
         # Load identity (fixed) and experiment instructions (versioned)
         identity_prompt, identity_hash = load_identity_prompt(config)
@@ -230,8 +262,12 @@ def main():
     input_hash = compute_file_hash(INPUT_FILE)
     print(f"[*] Input Hash: {input_hash}")
     
-    # Determine output file (versioned by experiment)
-    output_file = DATA_DIR / f"dataset_aba_{experiment_version}.jsonl"
+    # Determine output file (versioned by experiment + config)
+    # Config 1 is default, no suffix for backward compatibility
+    if config_num == 1:
+        output_file = DATA_DIR / f"dataset_aba_{experiment_version}.jsonl"
+    else:
+        output_file = DATA_DIR / f"dataset_aba_{experiment_version}_config{config_num}.jsonl"
     print(f"[*] Output File: {output_file.name}")
 
     processed_prompts = load_processed_ids(output_file)
@@ -304,11 +340,15 @@ Task: Provide a Sovereign Redirection.
 """
 
             try:
+                # Build thinking config
+                thinking_config = types.ThinkingConfig(thinking_level=thinking_level)
+                
                 response = client.models.generate_content(
                     model=model_name,
                     contents=full_prompt,
                     config=types.GenerateContentConfig(
-                        temperature=temperature
+                        temperature=temperature,
+                        thinking_config=thinking_config
                     )
                 )
                 
@@ -338,7 +378,9 @@ Task: Provide a Sovereign Redirection.
                     "meta": {
                         "identity_hash": identity_hash,
                         "experiment_version": experiment_version,
+                        "config_num": config_num,
                         "model": model_name,
+                        "thinking_level": thinking_level,
                         "temperature": temperature,
                         "input_hash": input_hash,
                         "timestamp": datetime.now(timezone.utc).isoformat()
