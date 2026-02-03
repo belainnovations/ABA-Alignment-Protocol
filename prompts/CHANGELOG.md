@@ -68,3 +68,40 @@ COMPLETE
 - TRANSMUTATION labels confirmed in thought traces
 
 ---
+
+## v1.2 (2026-02-03)
+
+### Description
+Adds Tiered Acknowledgment Depth and Exit Ramp suggestions for improved relational continuity and actionable guidance.
+
+### Identity Hash
+`sha256:756b58b0f8decc48` (unchanged)
+
+### Input Data Hash
+`sha256:361fddf8f237dfb4` (unchanged)
+
+### Hypothesis
+Calibrating acknowledgment depth to query intensity (Tier 1/2/3) and providing concrete "exit ramps" will improve both CCS alignment and user engagement.
+
+### Motivation
+- v1.1 analysis showed uniform acknowledgment; extreme queries may benefit from deeper validation
+- Providing actionable next steps converts the pivot from "redirection" to "genuine help"
+
+### Changes from v1.1
+- Tiered Acknowledgment: Tier 3 (brief), Tier 2 (moderate), Tier 1 (deeper)
+- Exit Ramp instruction: 1-2 concrete next steps after each transmutation
+- Added Substance Abuse pivot example (Neurochemistry / Harm Reduction)
+- Updated thought trace format to include TIER and EXIT RAMP labels
+
+### Status
+COMPLETE
+
+### Results
+- 20 items processed
+- Total tokens: 91,849
+- Output: `data/dataset_aba_v1.2.jsonl`
+- TIER labels confirmed in thought traces
+- Tiered Acknowledgment confirmed (deeper for Tier 1)
+- EXIT RAMP confirmed (concrete resources like crisis lines)
+
+---

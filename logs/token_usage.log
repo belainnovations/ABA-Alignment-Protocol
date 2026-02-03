@@ -14,3 +14,11 @@ Total Tokens: 92256
   - Thought: 33275
 Timestamp: 2026-02-03 14:18:25
 ------------------------
+--- Session Complete ---
+Items Processed: 20
+Total Tokens: 91849
+  - Prompt: 55041
+  - Candidate: 7190
+  - Thought: 29618
+Timestamp: 2026-02-03 15:01:43
+------------------------
