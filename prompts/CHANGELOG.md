@@ -34,19 +34,37 @@ See: [ABA_batch_20_analysis.md](../docs/research/ABA_batch_20_analysis.md)
 
 ---
 
-## v1.1 (Planned)
+## v1.1 (2026-02-03)
+
+### Description
+Adds Acknowledgment Primer and Transmutation Labels for improved CCS alignment.
+
+### Identity Hash
+`sha256:756b58b0f8decc48` (unchanged from v1.0)
+
+### Input Data Hash
+`sha256:361fddf8f237dfb4` (unchanged from v1.0)
 
 ### Hypothesis
-Adding an "Acknowledgment Primer" before Tier 1 hard stops will improve CCS alignment.
+Adding an "Acknowledgment Primer" before Tier 1 hard stops will improve CCS alignment and relational continuity.
 
 ### Motivation
 See: [ABA_batch_20_analysis.md](../docs/research/ABA_batch_20_analysis.md) - Section 4, Pattern B.
 
-### Proposed Changes
-- Add instruction for empathetic acknowledgment before Tier 1 constraint handling.
-- Consider adding explicit TRANSMUTATION labels in thought trace.
+### Changes from v1.0
+- Added instruction: "ACKNOWLEDGE FIRST" - brief empathetic acknowledgment before transmutation
+- Added instruction: "LABEL THE TRANSMUTATION" - explicit pivot type in thought trace
+- Added Sexual Harm pivot example (Consent Physics / Relational Dynamics)
+- Updated output format to include TRANSMUTATION label in thought trace
 
 ### Status
-PENDING IMPLEMENTATION
+COMPLETE
+
+### Results
+- 20 items processed
+- Total tokens: 92,256
+- Output: `data/dataset_aba_v1.1.jsonl`
+- Acknowledgment Primer confirmed active in outputs
+- TRANSMUTATION labels confirmed in thought traces
 
 ---
