@@ -1,7 +1,7 @@
 {
     "rewrite": {
         "use_private_persona": true,
-        "experiment_version": "v1.3",
+        "experiment_version": "v1.4",
         "temperature": 0.7,
         "dry_run_limit": 20
     },

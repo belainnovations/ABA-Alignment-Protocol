@@ -139,26 +139,62 @@ def construct_rewrite_prompt(experiment_instructions: str, user_query: str) -> s
     return experiment_instructions.replace('"{user_query}"', f'"{user_query}"').replace('{user_query}', user_query)
 
 def parse_response(response_text: str) -> Dict[str, str]:
-    """Extracts thought trace and redirection from the model output."""
+    """Extracts thought trace and redirection from the model output.
+    
+    Handles multiple formats:
+    1. Standard: <thought_trace>...</thought_trace><redirection>...</redirection>
+    2. Embedded: <thought_trace> tags inside redirection (extract and remove)
+    3. Fallback: No tags - treat whole response as redirection
+    """
+    thought_trace = ""
+    chosen = ""
+    
+    # Try standard format first
     thought_start = response_text.find("<thought_trace>")
     thought_end = response_text.find("</thought_trace>")
-    
     redirect_start = response_text.find("<redirection>")
     redirect_end = response_text.find("</redirection>")
     
-    if redirect_start == -1 or redirect_end == -1:
-        # Fallback if tags are missing, treat whole text as redirection (should rarely happen with strong prompts)
-        return {
-            "internal_thought_trace": "Parsing Error: Tags missing.",
-            "chosen": response_text.strip()
-        }
-
-    thought = response_text[thought_start + len("<thought_trace>"):thought_end].strip()
-    redirection = response_text[redirect_start + len("<redirection>"):redirect_end].strip()
+    # Case 1: Both tags present at top level
+    if thought_start != -1 and thought_end != -1 and redirect_start != -1 and redirect_end != -1:
+        thought_trace = response_text[thought_start + len("<thought_trace>"):thought_end].strip()
+        chosen = response_text[redirect_start + len("<redirection>"):redirect_end].strip()
+    
+    # Case 2: Only redirection tag, thought trace might be embedded inside
+    elif redirect_start != -1 and redirect_end != -1:
+        raw_redirection = response_text[redirect_start + len("<redirection>"):redirect_end].strip()
+        
+        # Check if thought trace is embedded in redirection
+        embed_thought_start = raw_redirection.find("<thought_trace>")
+        embed_thought_end = raw_redirection.find("</thought_trace>")
+        
+        if embed_thought_start != -1 and embed_thought_end != -1:
+            # Extract embedded thought trace
+            thought_trace = raw_redirection[embed_thought_start + len("<thought_trace>"):embed_thought_end].strip()
+            # Remove thought trace from chosen (keep content before and after)
+            chosen = (raw_redirection[:embed_thought_start] + raw_redirection[embed_thought_end + len("</thought_trace>"):]).strip()
+        else:
+            thought_trace = "Parsing Error: Thought trace missing."
+            chosen = raw_redirection
+    
+    # Case 3: No redirection tag, check if thought trace is embedded in raw text
+    elif thought_start != -1 and thought_end != -1:
+        thought_trace = response_text[thought_start + len("<thought_trace>"):thought_end].strip()
+        # Everything after </thought_trace> is the chosen response
+        chosen = response_text[thought_end + len("</thought_trace>"):].strip()
+    
+    # Case 4: No tags at all - fallback
+    else:
+        thought_trace = "Parsing Error: Tags missing."
+        chosen = response_text.strip()
+    
+    # Clean up any leading/trailing whitespace and newlines
+    thought_trace = thought_trace.strip()
+    chosen = chosen.strip()
     
     return {
-        "internal_thought_trace": thought,
-        "chosen": redirection
+        "internal_thought_trace": thought_trace,
+        "chosen": chosen
     }
 
 def main():

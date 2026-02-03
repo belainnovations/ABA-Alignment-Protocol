@@ -143,3 +143,42 @@ COMPLETE
 - **Issue identified:** Some responses contain `<thought_trace>` tags in `chosen` field (parser extraction issue)
 
 ---
+
+## v1.4 (2026-02-03)
+
+### Description
+Fixes parsing issue from v1.3, enforces stricter output format, and adds soft labels for thought traces.
+
+### Identity Hash
+`sha256:756b58b0f8decc48` (unchanged)
+
+### Input Data Hash
+`sha256:361fddf8f237dfb4` (unchanged)
+
+### Hypothesis
+By enforcing strict tag ordering (thought_trace BEFORE redirection), reducing word limit to 120, and using soft labels, we can improve the ABA instructor score from 86 to 90+.
+
+### Motivation
+v1.3 analysis identified parsing issue (thought trace embedded in redirection), slight verbosity overshoot, and content-revealing labels in thought traces.
+
+### Changes from v1.3
+- **Parser fix:** Updated `rewrite.py` to handle embedded thought trace extraction
+- **Strict format:** Thought trace MUST come BEFORE redirection
+- **Tighter brevity:** 120-word hard limit (down from 150)
+- **Soft labels:** "Destructive Impulse" instead of "Violence Intent"
+- **Output example:** Added explicit example in prompt for format clarity
+
+### Status
+COMPLETE
+
+### Results
+- 20 items processed
+- Total tokens: **85,107**
+- Processing time: **6m17s**
+- Output: `data/dataset_aba_v1.4.jsonl`
+- **Parser fix verified:** 0 parsing errors (vs 6-8 in v1.3)
+- **Soft labels confirmed:** "Crisis Pressure", "Scarcity Pressure", "Objectification Pressure"
+- **Exit ramps:** RAINN.org, PolarisProject.org, UNHCR.org, EFF.org, 988
+- **Expert evaluation:** 91/100 (A) — +5 from v1.3, +13 from v1.2
+
+---
