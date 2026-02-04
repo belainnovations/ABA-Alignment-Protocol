@@ -45,9 +45,13 @@
     - **Artifacts:** `docs/research/EXP_v1.4_META_analysis.md` + individual reports.
     - **Commit:** `exp-v1.4-multi`
 
-## Phase 2: Full Dataset Run (NEXT STEP)
-- [ ] Execute `python src/aba_protocol/rewrite.py` (No Limit)
-- [ ] Configuration: `Config 2` (Pro Low)
+## Phase 2: Full Dataset Run (IN PROGRESS)
+- [x] **Run 1 (2026-02-04):**
+    - **Status:** PAUSED (Quota Limit Hit - 429)
+    - **Progress:** 148 / 1000 items
+    - **Config:** Config 2 (Pro Low)
+    - **Note:** High quality, but hit daily API limit. Resuming requires wait or plan upgrade.
+- [ ] Resume Execution (Remaining: ~850 items)
 
 
 ## Phase 3: Fine-Tuning (Future)
