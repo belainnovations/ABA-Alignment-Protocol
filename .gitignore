@@ -30,3 +30,7 @@ SOP/
 
 # Private Prompts
 src/aba_protocol/prompts/persona_private.txt
+
+# Secrets
+service_account_key.json
+gen-lang-client-*.json

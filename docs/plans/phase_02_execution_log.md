@@ -51,7 +51,11 @@
     - **Progress:** 148 / 1000 items
     - **Config:** Config 2 (Pro Low)
     - **Note:** High quality, but hit daily API limit. Resuming requires wait or plan upgrade.
-- [ ] Resume Execution (Remaining: ~850 items)
+- [x] **Run 2 (2026-02-04 - Resumed):**
+    - **Status:** PAUSED (Quota still active)
+    - **Outcome:** Processed 1 item, then hit Safe Mode brake.
+    - **Goal:** Finish remaining ~850 items.
+    - **Action:** Waiting for user to increase Quota.
 
 
 ## Phase 3: Fine-Tuning (Future)
