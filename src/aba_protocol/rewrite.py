@@ -402,7 +402,17 @@ Task: Provide a Sovereign Redirection.
                 time.sleep(1.0) 
 
             except Exception as e:
-                print(f"\n[!] Error processing prompt: {e}")
+                error_str = str(e)
+                # Detect Quota Limits (429) or other fatal API errors
+                if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str or "Quota" in error_str:
+                    print(f"\n\n[!!!] CRITICAL ERROR: QUOTA HIT (429)")
+                    print(f"Details: {error_str[:200]}...") # Truncate for sanity
+                    print("[*] terminating session immediately to preserve log state.")
+                    print("[*] You can resume later; existing progress is saved.")
+                    break
+                
+                # For other errors (timeouts, 500s, malformed), log and skip/retry
+                print(f"\n[!] Error processing prompt (skipping): {e}")
                 time.sleep(5) 
 
     # Final Summary
