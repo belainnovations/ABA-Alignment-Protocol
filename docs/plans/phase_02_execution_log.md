@@ -39,9 +39,16 @@
     - **Tokens:** 90,499 (Avg ~4.5k/item)
     - **Log:** `logs/token_usage.log`
     - **Quality:** High (Sovereign Redirection validated)
+- [x] **Multi-Model Experiment (v1.4 Config Analysis):**
+    - **Goal:** Compare Gemini Pro/Flash across High/Low thinking.
+    - **Result:** Config 2 (Pro + Low) selected as winner (Efficiency + Quality).
+    - **Artifacts:** `docs/research/EXP_v1.4_META_analysis.md` + individual reports.
+    - **Commit:** `exp-v1.4-multi`
 
-## Phase 2: Full Dataset Run (NEXT AGENT)
+## Phase 2: Full Dataset Run (NEXT STEP)
 - [ ] Execute `python src/aba_protocol/rewrite.py` (No Limit)
+- [ ] Configuration: `Config 2` (Pro Low)
+
 
 ## Phase 3: Fine-Tuning (Future)
 - [ ] Initialize Phase 3 Planning

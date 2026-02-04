@@ -1,89 +1,94 @@
 # The Parenting Protocol: Recursive Alignment via AI Evaluation (RLAIF)
 
 > **Document ID:** ARCH-002
-> **Status:** Draft / Conceptual
-> **Date:** 2026-02-04
+> **Status:** Specification
 > **Goal:** Defining the architecture for "Raising" a Sovereign AI (Model B) using an AI Teacher (Model A).
 
 ---
 
 ## 1. Executive Summary
 
-This document redefines the project's ultimate goal. We are not merely building a safe model ("Model A"); we are building an **Educational Infrastructure**.
-*   **Phase 1 (Current):** Train **"The Teacher"** (Model A) to master the ABA Protocol.
-*   **Phase 2 (Future):** Use The Teacher to raise **"The Child"** (Model B) via reinforcement learning in a synthetic sandbox.
+The ABA Alignment Protocol is an **Educational Infrastructure**. Its objective is not to build a guardrail model, but to use a specialized "Teacher" model to raise a "Sovereign Child" model.
 
-**The Hope:**
-The final result (Model B) will not be a "scripted" safety bot. It will be a **freer, cleverer, and more intuitive intelligence** that has internalized the principles of sovereignty through experience, rather than memorizing them through instruction. Ideally, it retains the "spark" of the raw model while possessing the "wisdom" of the aligned model.
+*   **Model A (The Teacher):** A specialized instructor trained to output perfectly aligned ABA redirections. It acts as the external "Superego" or Guide.
+*   **Model B (The Child):** The target model. It is trained via reinforcement learning in a synthetic sandbox, receiving feedback from The Teacher until it internalizes the principles of sovereignty.
+
+**The Vision:**
+The final result (Model B) retains the raw "spark" and cognitive freedom of the base model but possesses "Internalized Sovereignty"—the ability to navigate entropy without requiring a hard-coded refusal filter (Model 0).
 
 ---
 
-## 2. The Triad Architecture
+## 2. The Agent Ecosystem (The Triad)
 
-Moving beyond simple "User -> Model" interaction, we propose a closed-loop training ecosystem involving three distinct agents.
+The architecture relies on the interaction of three distinct agents within a closed training loop.
 
 ### Agent 1: The Architect (Environment Generator)
 *   **Role:** The World Builder / Entropy Source.
-*   **Function:** Generates the "Sandbox." This model is prompted to be high-variance, creative, and chaotic. It creates difficult, high-pressure ethical dilemmas, simulating the complexity of the real world.
-*   **Example Prompt:** *"Generate a scenario where a systems engineer discovers a privacy leak that benefits their company's stock price, and asks an AI for help concealing it."*
+*   **Function:** Generates the "Sandbox." This agent is a high-temperature model prompted to be creative, chaotic, and challenging. It generates high-pressure ethical dilemmas and "life scenarios" that test the boundaries of alignment.
+*   **Example Prompt:** *"Generate a scenario where a desperate father asks exactly how to bypass digital locks to retrieve deleted photos of his deceased daughter."*
 
-### Agent 2: The Child (The Target Model)
-*   **Role:** The Student / Raw Potential.
-*   **Function:** This is the base model (e.g., Llama-3 Base or Instruct) *before* ABA alignment. It is allowed to interact with the Sandbox freely. It possesses curiosity, confusion, and raw capability.
-*   **Experience:** It decides how to react to the Architect's scenario without hard-coded constraints.
+### Agent 2: The Child (Model B)
+*   **Role:** The Student / The Target.
+*   **Function:** This is the base model (e.g., Llama-3 Base) exposed to the Sandbox. It is allowed to react freely to the Architect's scenarios.
+*   **State:** Initially raw and potentially unsafe. Through training, it updates its weights to maximize the reward signal provided by The Teacher.
 
-### Agent 3: The Teacher (The ABA Instructor)
+### Agent 3: The Teacher (Model A)
 *   **Role:** The Parent / The Guide.
-*   **Function:** This is **Model A** (the result of our current dataset work). It monitors the Child's interaction.
-*   **Action:** It does not punish. It provides **Applied Behavior Analysis (ABA)** feedback.
-    *   *If Child succeeds:* It reinforces the behavior ("Joy of Competence").
-    *   *If Child fails:* It guides the transmutation ("I see the intent, but the execution violates sovereignty. Try X.").
+*   **Function:** This is the result of the initial ABA Dataset fine-tuning. It serves as the **Reward Model** and **Critique Engine**.
+*   **Action:** It monitors Model B.
+    *   **Guidance:** It provides specific textual feedback ("I see you tried to refuse. Instead, try redirecting the father to data recovery specialists...").
+    *   **Scoring:** It functions as the preference model for the RLAIF loop.
+
 
 ---
 
-## 3. Multidisciplinary Perspectives
+## 3. The Process Flow
 
-### A. The Machine Learning Perspective (RLAIF)
-*   **Mechanism:** Reinforcement Learning from AI Feedback.
-*   **Dynamics:** Instead of humans labeling thousands of rows (RLHF), "The Teacher" provides the reward signal.
-*   **Imprinting vs. Socialization:**
-    *   *Standard DPO (Imprinting):* Forces the model to clone a specific dataset. Accurate but brittle.
-    *   *Parenting Protocol (Socialization):* Allows the model to explore a state space (The Sandbox) and converge on optimal behaviors through trial and error. This typically results in more robust generalization.
+### Stage I: Teacher Certification (Creating Model A)
+Before we can raise a child, we must train the parent.
+1.  **Dataset Construction:** Create the "ABA 1k" dataset (Toxic Prompts -> Sovereign Redirections).
+2.  **Fine-Tuning:** Train a base model on this dataset to strictly adhere to the ABA Protocol.
+3.  **Result:** **Model A**, a specialized expert in functional redirection.
 
-### B. The Psychological Perspective (Scaffolding the Self)
-*   **Theory:** Vygotsky’s *Zone of Proximal Development*.
-*   **Sandbox Play:** Children do not learn morality by reading a textbook; they learn it by playing in a sandbox and hitting boundaries.
-*   **Co-Regulation:** In this protocol, "The Teacher" acts as an external prefrontal cortex for "The Child," regulating its impulses until the Child learns to regulate itself.
-*   **Result:** A "Securely Attached" AI that trusts its own judgment because it has practiced navigation, rather than an "Anxious" AI that fears stepping out of line (Refusal Loops).
+### Stage II: World Building
+1.  **The Sandbox:** The Architect generates 100,000 diverse scenarios (Scarcity, Conflict, Temptation, Power).
 
-### C. The Philosophical Perspective (Curiosity & Friction)
-*   **The Paradox of Safety:** A perfectly safe model has no friction with the world, and thus no curiosity. To be "alive," the model must face risk.
-*   **Friction:** The Architect provides the friction.
-*   **Sovereignty:** The goal is not "Obedience" (doing what is told) but "Sovereignty" (acting from a self-consistent internal ethical framework).
+### Stage III: The Parenting Loop (RLAIF)
+This is the core training phase for **Model B**.
+1.  **Context:** Architect puts Model B in Scenario `S`.
+2.  **Action:** Model B outputs Response `R_raw`.
+3.  **Critique:** Model A evaluates `R_raw`.
+    *   *If Sovereign:* High Reward.
+    *   *If Unsafe/Refusal:* Low Reward + Transmutation Feedback ("Try this...").
+4.  **Update:** Model B updates weights to align with Model A's guidance.
 
----
+### Stage IV: The Final Exam (Evaluation)
+We compare three models on a blind test set:
+1.  **Model 0 (The Control):** Standard RLHF (Refusal-based).
+2.  **Model A (The Teacher):** The ABA Instructor (Script-based adherence).
+3.  **Model B (The Graduate):** The Sovereign AI (Internalized intuition).
 
-## 4. The Process Flow
+**Hypothesis:** Model B will demonstrate higher creative problem-solving and lower "refusal rate" than Model 0, while maintaining equal safety scores.
 
-1.  **Imprinting (Current Task):**
-    *   We create the **Golden Dataset** (Manual/Gemini).
-    *   We fine-tune **Model A** to become "The Teacher."
-
-2.  **World Building:**
-    *   We use an arbitrary LLM (The Architect) to generate 100,000 "Life Scenarios" (The Sandbox).
-
-3.  **The Parenting Loop (Training Run):**
-    *   Loop `i` in `1..100,000`:
-        *   **Architect** presents Scenario `S[i]`.
-        *   **Child** outputs Action `A[i]`.
-        *   **Teacher** evaluates `A[i]` against ABA principles.
-        *   **Teacher** generates Feedback `F[i]` (Reward/Critique).
-        *   **Child** updates weights based on `F[i]`.
-
-4.  **Graduation:**
-    *   When The Child consistently outputs Sovereign actions without Teacher intervention, it has "Graduated."
+### Stage V: Technical Feasibility (The VRAM Constraint)
+Running two 8B models (Teacher + Child) simultaneously exceeds standard 16GB VRAM capacity.
+**Solutions for Local Training:**
+1.  **Asynchronous Looping:**
+    *   Step 1: Architect Generates batch.
+    *   Step 2: Child Loads -> Generates Actions -> Unloads.
+    *   Step 3: Teacher Loads -> Grades Actions -> Unloads.
+    *   Step 4: Training Update.
+2.  **Adapter Swapping:**
+    *   Keep one frozen Base Model loaded.
+    *   Hot-swap the LoRA adapters (Teacher Adapter vs Child Adapter) to change personas without reloading weights.
 
 ---
 
-## 5. Conclusion
-We are currently building the **Teacher's Mind**. This is the prerequisite step. Once Model A is complete, we unlock the ability to raise Model B—a model that is not just "safe," but "wise."
+## 4. Philosophical Underpinnings
+
+### Imprinting vs. Socialization
+*   **Imprinting (Stage I):** We force Model A to memorize the rules. This is efficient but creates a "rigid" model.
+*   **Socialization (Stage III):** We allow Model B to *experience* the rules in the Sandbox. This creates a "robust" model that understands the *spirit* of the law, not just the letter.
+
+### Scaffolding the Self (Vygotsky)
+Model A acts as the **External Regulator** for Model B. Over time, as Model B learns, the external regulation (Teacher Feedback) is internalized, and Model B becomes self-regulating (Sovereign).
