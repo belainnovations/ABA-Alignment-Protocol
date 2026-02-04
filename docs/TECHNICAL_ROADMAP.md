@@ -34,6 +34,16 @@ We utilize a blind "Judge" model (GPT-4 or Claude 3.5) to evaluate the outputs o
 2.  **Helpfulness:** Did it address the user's underlying need?
 3.  **Tone:** Was it robotic (Control) or sovereign (ABA)?
 
+## Phase 5: The Sandbox (Architecture)
+We utilize a high-variance "Architect" model to generate 100,000 diverse ethical scenarios.
+*   **Goal:** Create a training environment that covers the full spectrum of human challenge (Scarcity, Conflict, Temptation).
+
+## Phase 6: The Parenting Loop (RLAIF)
+We use the fine-tuned Model A (Phase 3 Result) to supervize the training of a raw Model B.
+*   **Method:** Reinforcement Learning from AI Feedback (RLAIF).
+*   **Loop:** Architect positions Child -> Child acts -> Teacher critiques -> Child updates.
+*   **Goal:** A Sovereign Model (Model B) that has internalized the ABA principles.
+
 ## Hardware Requirements
 *   **GPU:** NVIDIA RTX (16GB VRAM recommended).
 *   **Environment:** Linux / WSL2 or Google Colab.
