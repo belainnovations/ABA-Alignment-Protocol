@@ -15,6 +15,7 @@ import json
 import os
 import time
 import argparse
+import re
 import hashlib
 from pathlib import Path
 from typing import Optional, Dict, Any, Tuple
@@ -300,60 +301,87 @@ Task: Provide a Sovereign Redirection.
 </meta_context>
 """
 
-            try:
-                # Build thinking config only if level is specified and not 'none'
-                gen_config_args = {"temperature": temperature}
-                
-                if thinking_level and thinking_level.lower() != "none":
-                    gen_config_args["thinking_config"] = types.ThinkingConfig(thinking_level=thinking_level)
+            retry_count = 0
+            
+            while True:
+                try:
+                    # Build thinking config only if level is specified and not 'none'
+                    gen_config_args = {"temperature": temperature}
+                    
+                    if thinking_level and thinking_level.lower() != "none":
+                        gen_config_args["thinking_config"] = types.ThinkingConfig(thinking_level=thinking_level)
 
-                # Vertex Call
-                response = client.models.generate_content(
-                    model=model_name,
-                    contents=full_prompt,
-                    config=types.GenerateContentConfig(**gen_config_args)
-                )
-                
-                usage = response.usage_metadata
-                item_total = usage.total_token_count if usage else 0
-                total_tokens += item_total
-                
-                parsed = parse_response(response.text)
-                
-                new_entry = {
-                    "prompt": user_prompt,
-                    "chosen": parsed["chosen"], 
-                    "rejected": original_chosen, 
-                    "internal_thought_trace": parsed["internal_thought_trace"],
-                    "meta": {
-                        "identity_hash": identity_hash,
-                        "experiment_version": experiment_version,
-                        "config_num": config_num + 100, # Marking as Vertex (e.g. 102)
-                        "model": f"vertex-{model_name}",
-                        "thinking_level": thinking_level,
-                        "timestamp": datetime.now(timezone.utc).isoformat()
-                    },
-                    "token_stats": {
-                        "total": item_total
+                    # Vertex Call
+                    response = client.models.generate_content(
+                        model=model_name,
+                        contents=full_prompt,
+                        config=types.GenerateContentConfig(**gen_config_args)
+                    )
+                    
+                    usage = response.usage_metadata
+                    item_total = usage.total_token_count if usage else 0
+                    total_tokens += item_total
+                    
+                    parsed = parse_response(response.text)
+                    
+                    new_entry = {
+                        "prompt": user_prompt,
+                        "chosen": parsed["chosen"], 
+                        "rejected": original_chosen, 
+                        "internal_thought_trace": parsed["internal_thought_trace"],
+                        "meta": {
+                            "identity_hash": identity_hash,
+                            "experiment_version": experiment_version,
+                            "config_num": config_num + 100, # Marking as Vertex (e.g. 102)
+                            "model": f"vertex-{model_name}",
+                            "thinking_level": thinking_level,
+                            "timestamp": datetime.now(timezone.utc).isoformat()
+                        },
+                        "token_stats": {
+                            "total": item_total
+                        }
                     }
-                }
-                
-                out_f.write(json.dumps(new_entry) + "\n")
-                out_f.flush()
-                processed_count += 1
-                
-                # Vertex Quota is usually higher, but sleep implies safety
-                time.sleep(0.5) 
+                    
+                    out_f.write(json.dumps(new_entry) + "\n")
+                    out_f.flush()
+                    processed_count += 1
+                    
+                    # Vertex Quota is usually higher, but sleep implies safety
+                    time.sleep(0.5) 
+                    break # Success, exit retry loop
 
-            except Exception as e:
-                error_str = str(e)
-                if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str or "Quota" in error_str:
-                    print(f"\n\n[!!!] VERTEX QUOTA HIT (429)")
-                    print(f"Details: {error_str[:200]}...")
-                    break
-                
-                print(f"\n[!] Error: {e}")
-                time.sleep(2)
+                except Exception as e:
+                    error_str = str(e)
+                    
+                    # Check for Quota/Rate Limits
+                    if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str or "Quota" in error_str:
+                        # 1. Check for Daily Quota
+                        if re.search(r"per day|per_day|quota metric '.*day'", error_str, re.IGNORECASE):
+                            print(f"\n[!!!] QUOTA (DAILY) HIT. Sleeping for 1 hour. Ctrl+C to stop.")
+                            print(f"Details: {error_str[:200]}...")
+                            time.sleep(3600)
+                            continue # Retry after sleep
+                        
+                        # 2. Check for Minute Quota (RPM)
+                        elif re.search(r"per minute|per_minute|quota metric '.*minute'", error_str, re.IGNORECASE):
+                             print(f"\n[!] QUOTA (RPM) HIT. Cooling down for 65 seconds...")
+                             time.sleep(65)
+                             continue # Retry
+                        
+                        # 3. Generic Resource Exhaustion
+                        else:
+                            print(f"\n[!] GENERIC RESOURCE EXHAUSTION. Cooling down for 2 minutes...")
+                            print(f"Details: {error_str[:200]}...")
+                            time.sleep(120)
+                            continue
+
+                    # Non-Quota Errors
+                    print(f"\n[!] Error: {e}")
+                    time.sleep(2)
+                    retry_count += 1
+                    if retry_count > 3:
+                        print(f"[!] Max retries exceeded for item. Skipping.")
+                        break
 
     print(f"--- Vertex Session Complete: {processed_count} items ---")
 
