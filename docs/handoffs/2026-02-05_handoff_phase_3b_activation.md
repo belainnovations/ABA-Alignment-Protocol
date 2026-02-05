@@ -79,9 +79,11 @@ You have a working factory. Do not reinvent the wheel.
 *   **Dataset (Sovereign):** `data/dataset_aba_v1.4_backup.jsonl`
     *   *Status:* **VERIFIED.** High-quality DPO pairs (1,000 items). Ready for training.
 *   **Training Script:** `src/aba_protocol/train_model_a.py`
-    *   *Status:* **VERIFIED.** Works with Unsloth. Just needs the `model_name` updated to the new Uncensored Base.
+    *   *Status:* **TEMPLATE (REQUIRES EDIT).**
+    *   *Action:* You MUST change `MODEL_NAME` on Line 26 from `unsloth/Llama-3-8B-Instruct` to your new Uncensored Base.
 *   **Evaluation Script:** `src/aba_protocol/evaluate_model_a.py`
-    *   *Status:* **VERIFIED.** Can be easily adapted to compare Contender 1 vs Contender 2.
+    *   *Status:* **TEMPLATE (REQUIRES EDIT).**
+    *   *Action:* Update `ADAPTER_PATH` and `MODEL_NAME` to point to your new contenders.
 
 ---
 
