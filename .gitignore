@@ -36,3 +36,6 @@ src/aba_protocol/prompts/persona_private.txt
 service_account_key.json
 gen-lang-client-*.json
 docs/media/NotebookLM/
+
+# Unsloth Cache
+unsloth_compiled_cache/

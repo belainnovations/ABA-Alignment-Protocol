@@ -7,10 +7,10 @@
 - [x] Update state documents
 
 ## Phase 3.2: Environment Setup
-- [ ] Verify Unsloth installation in `aba_protocol_env`
-- [ ] Verify TRL (Transformers Reinforcement Learning) installation
-- [ ] Download/configure base model (Llama-3-8B)
-- [ ] Hardware verification (GPU VRAM check)
+- [x] Verify Unsloth installation in `aba_protocol_env` ✓
+- [x] Verify TRL (Transformers Reinforcement Learning) installation — v0.24.0 ✓
+- [x] Configure PyTorch for RTX 5070 Ti — PyTorch 2.11.0+cu128 nightly ✓
+- [x] Hardware verification (GPU VRAM check) — 16GB VRAM ✓
 
 ## Phase 3.3: Training Script
 - [ ] Create `train_model_a.py`
