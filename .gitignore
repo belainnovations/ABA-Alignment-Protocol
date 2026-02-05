@@ -24,6 +24,7 @@ SOP/
 # Data (If large)
 *.jsonl
 /data/
+!data/splits/
 
 # Environment Variables
 .env
