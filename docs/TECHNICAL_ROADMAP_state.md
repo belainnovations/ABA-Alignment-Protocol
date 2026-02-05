@@ -25,12 +25,12 @@ We are currently executing **Phase 3: Teacher Evaluation** (sub-phase 3.4: Train
 *   **Model A1 (Repair):** Training on Llama-3-8B-Instruct (Current).
 *   **Model A2 (Native):** Scheduled for Phase 3b.
 
-### Phase 3: Teacher Evaluation [PENDING]
-*   Wait for training completion.
-*   Execute `TC-003`.
+### Phase 3: Teacher Evaluation [COMPLETE - FAILED]
+*   **Outcome:** Refusal Rate 58% (Target < 5%). "Gene Therapy" Hypothesis Disproven.
+*   **Action:** Activate Phase 3b.
 
-### Phase 3b: Apples-to-Apples Experiment [NEW]
-*   **Status:** Defined in roadmap.
+### Phase 3b: Apples-to-Apples Experiment [READY]
+*   **Status:** Next Up.
 *   **Requirement:** Procure Uncensored Llama-3-8B.
 
 ---

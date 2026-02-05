@@ -32,8 +32,8 @@ The architecture is defined and agreed upon. We are currently in **Stage I: Teac
 
 ### Stage I (Teacher)
 - [x] Generate Full ABA Dataset (1k items) via `rewrite.py`. **(DONE: 2026-02-04)**
-- [/] Fine-Tune Model A (Unsloth).
-- [ ] Verify Model A (Protocol Adherence >95%).
+- [x] Fine-Tune Model A (Unsloth).
+- [x] Verify Model A (Protocol Adherence >95%) -> **FAILED (58% Refusal). Pivot to Phase 3b.**
 
 ### Stage Ib (Apples-to-Apples Experiment)
 - [ ] Train Model A_Native (Uncensored Base).

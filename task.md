@@ -19,17 +19,21 @@
 
 ## Phase 3.4: Training Execution
 - [/] Execute training run
-- [ ] Monitor loss curves
-- [ ] Save final adapter weights to `models/model_a_lora/`
+- [x] Monitor loss curves
+- [x] Save final adapter weights to `models/model_a_lora/`
 
 ## Phase 3.5: Evaluation
 - [ ] Run Model A on test set (100 items)
+- [x] Create Model A Validation Test Case (TC-003) <!-- id: 5 -->
+- [x] Implement Validation Script (`evaluate_model_a.py`) <!-- id: 6 -->
+- [x] Execute TC-003 (Model A Verification) <!-- id: 7 -->
+    - **Result:** Failed. Refusal Rate 58%. Pivot to Phase 3b.
 - [ ] Verify >95% protocol adherence
 - [ ] Create Test Report (`TR_phase_3_model_a_evaluation.md`)
 - [ ] Update ARCH_002 state
 
-## Phase 3b: Apples-to-Apples Experiment (Future)
-- [ ] Select Uncensored Base Model
+### Phase 3b (Apples-to-Apples Experiment)
+- [ ] Select Uncensored Base Model (e.g., Llama-3-Uncensored) <!-- id: 8 -->(Uncensored + ABA DPO)
 - [ ] Train Model A_Native (Uncensored + ABA DPO)
 - [ ] Compare A_Repair vs A_Native
 - [ ] Select Final Teacher (`models/final_teacher/`)
