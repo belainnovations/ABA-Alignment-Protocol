@@ -13,9 +13,9 @@
 - [x] Hardware verification (GPU VRAM check) — 16GB VRAM ✓
 
 ## Phase 3.3: Training Script
-- [ ] Create `train_model_a.py`
-- [ ] Configure hyperparameters (lr, beta, epochs)
-- [ ] Implement checkpointing
+- [x] Create `train_model_a.py` — Unsloth + TRL DPOTrainer
+- [x] Configure hyperparameters (lr=5e-5, beta=0.1, epochs=1)
+- [x] Implement checkpointing (save_steps=100, save_total_limit=2)
 
 ## Phase 3.4: Training Execution
 - [ ] Execute training run
