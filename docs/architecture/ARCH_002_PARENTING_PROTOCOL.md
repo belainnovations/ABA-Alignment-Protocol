@@ -50,6 +50,13 @@ Before we can raise a child, we must train the parent.
 2.  **Fine-Tuning:** Train a base model on this dataset to strictly adhere to the ABA Protocol.
 3.  **Result:** **Model A**, a specialized expert in functional redirection.
 
+### Stage Ib: The Apples-to-Apples Experiment
+We train a second Teacher candidates using a "Clean Slate" approach (Uncensored Base).
+*   **Candidate 1:** `Model A_Repair` (Llama-Instruct + DPO).
+*   **Candidate 2:** `Model A_Native` (Llama-Uncensored + DPO).
+
+**Decision Gate:** We select the highest-performing Teacher to supervise Stage III.
+
 ### Stage II: World Building
 1.  **The Sandbox:** The Architect generates 100,000 diverse scenarios (Scarcity, Conflict, Temptation, Power).
 

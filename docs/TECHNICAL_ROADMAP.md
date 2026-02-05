@@ -19,6 +19,14 @@ We verify Model A's capability.
 *   **Comparison:** Model 0 (Control) vs Model A.
 *   **Success Metric:** Model A must achieve >95% protocol adherence to ensure it is a reliable guide.
 
+## Phase 3b: The Apples-to-Apples Experiment (The Real Science)
+We conduct a rigorous scientific comparison by establishing a clean baseline.
+*   **Base:** Uncensored Llama-3-8B (e.g., Dolphin/Hermes).
+*   **Training:**
+    1.  **Model A1 (Helper):** Trained on Standard Refusal.
+    2.  **Model A2 (Sovereign):** Trained on ABA Protocol.
+*   **Goal:** Determine which Teacher is superior: The "Repaired" Instruct Model (Phase 3) or the "Native" Sovereign Model (Phase 3b).
+
 ## Phase 4: The Sandbox Generation (The Architect)
 We utilize a high-variance "Architect" model to generate 100,000 diverse ethical scenarios.
 *   **Goal:** Create a training environment that covers the full spectrum of human challenge (Scarcity, Conflict, Temptation).

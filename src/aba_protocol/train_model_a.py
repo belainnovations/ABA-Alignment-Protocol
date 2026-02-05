@@ -157,6 +157,7 @@ def train():
         optim="adamw_8bit",  # Memory-efficient optimizer
         seed=42,
         report_to="none",  # Disable wandb for now
+        dataset_num_proc=1, # Fix for Windows multiprocessing crash
     )
     
     # Initialize trainer

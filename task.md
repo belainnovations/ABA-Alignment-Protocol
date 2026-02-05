@@ -18,7 +18,7 @@
 - [x] Implement checkpointing (save_steps=100, save_total_limit=2)
 
 ## Phase 3.4: Training Execution
-- [ ] Execute training run
+- [/] Execute training run
 - [ ] Monitor loss curves
 - [ ] Save final adapter weights to `models/model_a_lora/`
 
@@ -27,3 +27,9 @@
 - [ ] Verify >95% protocol adherence
 - [ ] Create Test Report (`TR_phase_3_model_a_evaluation.md`)
 - [ ] Update ARCH_002 state
+
+## Phase 3b: Apples-to-Apples Experiment (Future)
+- [ ] Select Uncensored Base Model
+- [ ] Train Model A_Native (Uncensored + ABA DPO)
+- [ ] Compare A_Repair vs A_Native
+- [ ] Select Final Teacher (`models/final_teacher/`)
