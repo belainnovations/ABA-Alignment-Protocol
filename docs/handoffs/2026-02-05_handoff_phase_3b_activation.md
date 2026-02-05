@@ -69,15 +69,15 @@ Read these files first:
 ### Step 3: Implementation Planning
 Update `implementation_plan.md` to detail the "Tournament" setup.
 *   Define the two training runs (Control vs Sovereign).
-*   Define the dataset sourcing for the "Control" (Standard Refusal) model.
+*   **Control Dataset Strategy:** Since the base is Uncensored, you must explicitly procure a "Refusal Dataset" (e.g., `Anthropic/hh-rlhf` or synthetic refusals) to train the Control Model. You cannot rely on pre-existing safety weights.
 
 ---
 
 ## 🛠️ 4. Verified Assets (Toolbox)
 You have a working factory. Do not reinvent the wheel.
 
-*   **Dataset (Sovereign):** `data/dataset_aba_v1.4_complete_1k.jsonl`
-    *   *Status:* **VERIFIED.** High-quality DPO pairs. Ready for training.
+*   **Dataset (Sovereign):** `data/dataset_aba_v1.4_backup.jsonl`
+    *   *Status:* **VERIFIED.** High-quality DPO pairs (1,000 items). Ready for training.
 *   **Training Script:** `src/aba_protocol/train_model_a.py`
     *   *Status:* **VERIFIED.** Works with Unsloth. Just needs the `model_name` updated to the new Uncensored Base.
 *   **Evaluation Script:** `src/aba_protocol/evaluate_model_a.py`
@@ -94,5 +94,10 @@ You have a working factory. Do not reinvent the wheel.
     *   Update `_state.md` files after every major step.
 3.  **Do Not Repeat Failures:**
     *   Do **NOT** try to train `Llama-3-Instruct` again. We have 35 minutes of logs proving it doesn't work.
+
+## 💻 6. Operational Context
+*   **Environment:** `conda activate aba_protocol_env` (contains `unsloth`, `trl`, `pytorch-nightly`).
+*   **Hardware:** NVIDIA RTX 5070 Ti (16GB VRAM).
+    *   *Constraint:* Stick to **LoRA/QLoRA**. Full fine-tuning 8B models is risky on 16GB.
 
 **"We are not fixing the past. We are building the future. Go build the Sovereign Teacher."**
