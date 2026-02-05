@@ -23,7 +23,7 @@ from transformers import TrainingArguments
 # =============================================================================
 
 # Model Configuration
-MODEL_NAME = "unsloth/Llama-3.2-3B-Instruct"  # Start with 3B for faster iteration
+MODEL_NAME = "unsloth/Llama-3-8B-Instruct"  # Official 8B Instruct model
 MAX_SEQ_LENGTH = 2048
 LOAD_IN_4BIT = True  # QLoRA - fits in 16GB VRAM
 
