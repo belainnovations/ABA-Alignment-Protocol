@@ -4,7 +4,7 @@
 - [x] Backup `dataset_aba_v1.4_config2.jsonl` → `dataset_aba_v1.4_backup.jsonl`
 - [x] Create Train/Val/Test splits (800/100/100) → `data/splits/`
 - [x] Verify DPO format compatibility (prompt, chosen, rejected)
-- [ ] Update state documents
+- [x] Update state documents
 
 ## Phase 3.2: Environment Setup
 - [ ] Verify Unsloth installation in `aba_protocol_env`

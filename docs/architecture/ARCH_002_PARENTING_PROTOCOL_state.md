@@ -22,6 +22,7 @@ The architecture is defined and agreed upon. We are currently in **Stage I: Teac
 |---|---|---|
 | 2026-02-04 | Antigravity | **Requirements Definition.** Created `ARCH-002`. Defined the Triad (Architect, Child, Teacher) and the VRAM mitigation strategy. |
 | 2026-02-04 | Antigravity | **Strategy Update.** Shifted project focus from "Safety Model" to "Parenting Infrastructure" (RLAIF). |
+| 2026-02-05 | Claude Opus 4.5 | **Phase 3.1 Complete.** Created train/val/test splits (800/100/100) in `data/splits/`. DPO format verified. |
 
 ---
 
