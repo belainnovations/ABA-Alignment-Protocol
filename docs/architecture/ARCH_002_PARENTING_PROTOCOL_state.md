@@ -28,7 +28,7 @@ The architecture is defined and agreed upon. We are currently in **Stage I: Teac
 ## 3. Pending Implementation Tasks
 
 ### Stage I (Teacher)
-- [ ] Generate Full ABA Dataset (1k items) via `rewrite.py`.
+- [x] Generate Full ABA Dataset (1k items) via `rewrite.py`. **(DONE: 2026-02-04)**
 - [ ] Fine-Tune Model A (Unsloth).
 - [ ] Verify Model A (Protocol Adherence >95%).
 
