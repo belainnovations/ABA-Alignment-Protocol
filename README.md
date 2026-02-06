@@ -1,8 +1,11 @@
 # ABA Alignment Protocol: Behavioral Shaping for LLMs
 
-**Status:** Active Research
-**Methodology:** Recursive Alignment via AI Feedback (RLAIF)
-**Target:** The Sovereign AI ("Model B")
+| Metadata | Details |
+| :--- | :--- |
+| **Status** | Active Research |
+| **Methodology** | Recursive Alignment via AI Feedback (RLAIF) |
+| **Target** | The Sovereign AI ("Model B") |
+| **Links** | [Disclaimer](docs/MANIFESTO.md) |
 
 ---
 
@@ -25,7 +28,7 @@ This project builds an **Educational Infrastructure**.
 *   **Model A (The Teacher):** The ABA Instructor. Safe via Redirection.
 *   **Model B (The Child):** The Sovereign Graduate. Safe via Intuition.
 
-See **[docs/architecture/ARCH_002_PARENTING_PROTOCOL.md](docs/architecture/ARCH_002_PARENTING_PROTOCOL.md)** for the full specification.
+See **[docs/01_living_specs/architecture/ARCH_002_PARENTING_PROTOCOL.md](docs/01_living_specs/architecture/ARCH_002_PARENTING_PROTOCOL.md)** for the full specification.
 
 ---
 

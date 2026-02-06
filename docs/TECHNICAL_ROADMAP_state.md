@@ -1,8 +1,10 @@
 # State: Technical Roadmap
 
-> **Definition Document:** [TECHNICAL_ROADMAP.md](./TECHNICAL_ROADMAP.md)
-> **Last Updated:** 2026-02-05
-> **Status:** ACTIVE
+| Metadata | Details |
+| :--- | :--- |
+| **Definition Document** | [TECHNICAL_ROADMAP.md](TECHNICAL_ROADMAP.md) |
+| **Last Updated** | 2026-02-05 |
+| **Status** | ACTIVE |
 
 ---
 

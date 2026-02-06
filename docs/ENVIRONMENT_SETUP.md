@@ -1,5 +1,11 @@
 # Environment Setup & Configuration
 
+| Metadata | Details |
+| :--- | :--- |
+| **Type** | Configuration Guide |
+| **Status** | Active |
+| **Links** | [Documentation Strategy](documentation_strategy.md) |
+
 ## Active Python Interpreter
 **Crucial for Agent Execution:** All commands must utilize this absolute path to access the correct Conda environment.
 

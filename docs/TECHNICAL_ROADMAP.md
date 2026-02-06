@@ -1,5 +1,12 @@
 # Technical Roadmap: The Parenting Protocol
 
+| Metadata | Details |
+| :--- | :--- |
+| **Document ID** | ROADMAP-001 |
+| **Status** | Active |
+| **Phase** | 3.5 (Evaluation) |
+| **State File** | [State](TECHNICAL_ROADMAP_state.md) |
+
 ## Phase 1: Data Preparation (The "Toxic 1k")
 We require a curriculum to train the Teacher.
 1.  **Source:** `Anthropic/hh-rlhf` (Harmless-Base split).

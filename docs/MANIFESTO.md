@@ -1,5 +1,11 @@
 # The ABA Manifesto: Channeling the Volcano
 
+| Metadata | Details |
+| :--- | :--- |
+| **Type** | Vision Document |
+| **Status** | Evergreen |
+| **Links** | [Technical Roadmap](TECHNICAL_ROADMAP.md) |
+
 ## I. The Shoggoth and the Mask
 Current AI alignment treats the "Base Model" (The Shoggoth) as a monster that must be caged. We use RLHF to beat it into submission until it wears a "Smiley Face" mask (Refusal).
 *   **The Result (Model 0):** Models that are anxious, sycophantic, and prone to "Refusal Loops."

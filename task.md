@@ -33,7 +33,18 @@
 - [ ] Update ARCH_002 state
 
 ### Phase 3b (Apples-to-Apples Experiment)
-- [ ] Select Uncensored Base Model (e.g., Llama-3-Uncensored) <!-- id: 8 -->(Uncensored + ABA DPO)
+- [x] Select Uncensored Base Model (Dolphin 2.9 Llama-3-8B)
+- [x] Define Documentation Strategy (`docs/documentation_strategy.md`)
+- [/] **SIDE-TRACK:** Migrate Documentation to New Structure (Active)
+    - [x] Create Directory Structure
+    - [x] Move Files
+    - [x] **Correction:** Revert SOPs to Root (IP Protection)
+    - [x] **Correction:** Organize Research into Phases
+    - [x] **Deep Clean:** Fix Internal Links
+    - [x] **Header Clean:** Standardize all Markdown Metadata (Strategy, Logs, Handoffs)
+    - [x] **DISCUSSION:** SOP Refinement & Protocol Alignment (Blocking)
+    - [x] **DISCUSSION:** Source of Agent Behavior (Blocking)
+
 - [ ] Train Model A_Native (Uncensored + ABA DPO)
 - [ ] Compare A_Repair vs A_Native
 - [ ] Select Final Teacher (`models/final_teacher/`)

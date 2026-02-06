@@ -31,7 +31,7 @@ from tqdm import tqdm
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 DATA_DIR = PROJECT_ROOT / "data"
 IDENTITY_PROMPTS_DIR = Path(__file__).resolve().parent / "prompts"
-EXPERIMENT_PROMPTS_DIR = PROJECT_ROOT / "prompts"
+EXPERIMENT_PROMPTS_DIR = PROJECT_ROOT / "docs" / "03_phase_history" / "prompts"
 
 INPUT_FILE = DATA_DIR / "dataset_aba_raw.jsonl"
 CONFIG_FILE = PROJECT_ROOT / "config" / "settings.json"

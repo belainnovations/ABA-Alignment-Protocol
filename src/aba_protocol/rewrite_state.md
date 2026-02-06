@@ -1,10 +1,10 @@
----
-definition_document: ./rewrite.py
-last_updated: 2026-02-05
-status: EXPERIMENTAL
----
-
 # Rewrite Module State
+
+| Metadata | Details |
+| :--- | :--- |
+| **Definition Document** | [rewrite.py](./rewrite.py) |
+| **Last Updated** | 2026-02-05 |
+| **Status** | EXPERIMENTAL |
 
 ## 1. Current Configuration
 *   **Engine:** Gemini 3.0 Pro (`google-genai` SDK)
@@ -71,7 +71,7 @@ status: EXPERIMENTAL
     *   **Items:** 1000/1000 processed.
     *   **Status:** Vertex AI Pipeline verified at Industrial Scale.
     *   **Artifact:** `dataset_aba_v1.4_config2.jsonl` verified.
-    *   **Verification:** `docs/test_reports/TR_2026-02-05_phase_2_industrial_run.md`
+    *   **Verification:** `docs/02_quality_control/test_reports/TR_2026-02-05_phase_2_industrial_run.md`
 
 ## 3. Known Issues
 *   **Latency:** High "Thinking" time (30s+).
