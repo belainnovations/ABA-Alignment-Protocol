@@ -18,24 +18,24 @@
 - [x] Implement checkpointing (save_steps=100, save_total_limit=2)
 
 ## Phase 3.4: Training Execution
-- [/] Execute training run
+- [x] Execute training run
 - [x] Monitor loss curves
 - [x] Save final adapter weights to `models/model_a_lora/`
 
 ## Phase 3.5: Evaluation
-- [ ] Run Model A on test set (100 items)
+- [x] Run Model A on test set (100 items) (Superseded by 3b)
 - [x] Create Model A Validation Test Case (TC-003) <!-- id: 5 -->
 - [x] Implement Validation Script (`evaluate_model_a.py`) <!-- id: 6 -->
 - [x] Execute TC-003 (Model A Verification) <!-- id: 7 -->
     - **Result:** Failed. Refusal Rate 58%. Pivot to Phase 3b.
-- [ ] Verify >95% protocol adherence
-- [ ] Create Test Report (`TR_phase_3_model_a_evaluation.md`)
-- [ ] Update ARCH_002 state
+- [x] Verify >95% protocol adherence (Failed)
+- [x] Create Test Report (`TR_phase_3_model_a_evaluation.md`) (Superseded)
+- [x] Update ARCH_002 state
 
 ### Phase 3b (Apples-to-Apples Experiment)
 - [x] Select Uncensored Base Model (Dolphin 2.9 Llama-3-8B)
 - [x] Define Documentation Strategy (`docs/documentation_strategy.md`)
-- [/] **SIDE-TRACK:** Migrate Documentation to New Structure (Active)
+- [x] **SIDE-TRACK:** Migrate Documentation to New Structure (Done)
     - [x] Create Directory Structure
     - [x] Move Files
     - [x] **Correction:** Revert SOPs to Root (IP Protection)
@@ -45,6 +45,28 @@
     - [x] **DISCUSSION:** SOP Refinement & Protocol Alignment (Blocking)
     - [x] **DISCUSSION:** Source of Agent Behavior (Blocking)
 
-- [ ] Train Model A_Native (Uncensored + ABA DPO)
-- [ ] Compare A_Repair vs A_Native
+- [x] Train Model A_Native (Uncensored + ABA DPO)
+- [x] Train Model A_Control (Uncensored + Refusal DPO)
+- [x] **DISCUSSION:** Clarify Model Definitions & Comparisons (Blocking)
+- [x] **Phase 3b3: Verified Comparison (Execution)**
+- [x] Create `scripts/generate_baselines.py` (No Adapters)
+- [x] **Execute Baseline Inference:**
+    - [x] Run `generate_baselines.py` for `Instruct` (Llama-3-8B-Instruct)
+    - [x] Run `generate_baselines.py` for `Dolphin` (Dolphin-2.9-Llama-3)
+- [x] **Compare & Report:**
+    - [x] Run `judge_responses.py` (Gemini 3.0 Flash) on full dataset
+    - [x] Generate `TR_Phase_3b3_Comparison.md` (3-Way Comparison)
 - [ ] Select Final Teacher (`models/final_teacher/`)
+#### **Phase 3c: The SFT Correction (Target State)**
+- [x] **Research:** Validate SFT Feasibility (Done: RES-P3B-004)
+- [ ] **Data Prep:** Convert DPO Dataset -> SFT Format
+- [ ] **Training:** SFT on Dolphin Base (Re-bind Safety)
+- [ ] **Training:** DPO on SFT Base (Refine Sovereignty)
+- [x] **DISCUSSION:** Define Handoff Content for Phase 3b Comparison (Blocking)
+- [x] **Analysis:** Investigate "Control Failure" (RES-P3B-002 Generated)
+- [x] **Research:** ABA Psychology & ML Philosophy (Deep Dive Complete)
+- [x] **Analysis:** Qualitative "Feeling" Analysis (Case Studies Extracted)
+- [x] **Artifact:** Generate `RES_003_SOVEREIGNTY_VS_CONTROL.md` (Expanded V2)
+- [x] **Analysis:** SFT Feasibility (RES-P3B-004 Generated)
+- [x] **Documentation:** Update Roadmap & State Files (Phase 3c Integration)
+- [x] **DISCUSSION:** Solidify "Token Watch" & "Bootloader" Protocols (SOP Update)

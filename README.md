@@ -38,7 +38,7 @@ We are conducting a multi-stage evolution.
 
 ### Stage I: Forging the Teacher (Model A)
 *   **Goal:** Create a model that consistently applies "Functional Redirection" (ABA) instead of "Refusal."
-*   **Method:** DPO Fine-tuning on the "ABA Subset" (1k high-toxicity prompts rewritten with sovereign answers).
+*   **Method:** Fine-tuning on the "ABA Subset" (1k high-toxicity prompts rewritten with sovereign answers).
 *   **Role:** This model serves as the **Guidance System** for the next stage. It is not the final product; it is the mold.
 
 ### Stage II: Raising the Child (Model B)
@@ -49,7 +49,7 @@ We are conducting a multi-stage evolution.
 ---
 
 ## 4. Technical Stack
-*   **Optimization:** DPO / RLAIF.
+*   **Optimization:** DPO / RLAIF / Supervised Fine-Tuning (SFT).
 *   **Data Generation:** Gemini 3 Pro (Teacher Logic) / Flash (Sandbox Scenarios).
 *   **Training/Inference:** Local Llama-3-8B (Model A/B).
 *   **Fine-Tuning:** Unsloth (LoRA/QLoRA) for efficiency.

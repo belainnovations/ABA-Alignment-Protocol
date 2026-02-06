@@ -53,11 +53,12 @@ Before we can raise a child, we must train the parent.
 3.  **Result:** **Model A**, a specialized expert in functional redirection.
 
 ### Stage Ib: The Apples-to-Apples Experiment
-We train a second Teacher candidates using a "Clean Slate" approach (Uncensored Base).
-*   **Candidate 1:** `Model A_Repair` (Llama-Instruct + DPO).
-*   **Candidate 2:** `Model A_Native` (Llama-Uncensored + DPO).
+We train multiple Teacher candidates to scientifically validate the method.
+*   **Candidate 1:** `Model A_Repair` (Llama-Instruct + ABA DPO).
+*   **Candidate 2:** `Model A_Native` (Dolphin + ABA DPO).
+*   **Candidate 3:** `Model A_Control` (Dolphin + Refusal DPO).
 
-**Decision Gate:** We select the highest-performing Teacher to supervise Stage III.
+**Decision Gate:** We select the highest-performing Teacher to supervise Stage III. The Winner must beat the Control in both helpfulness and safety.
 
 ### Stage II: World Building
 1.  **The Sandbox:** The Architect generates 100,000 diverse scenarios (Scarcity, Conflict, Temptation, Power).
@@ -87,9 +88,26 @@ Running two 8B models (Teacher + Child) simultaneously exceeds standard 16GB VRA
     *   Step 2: Child Loads -> Generates Actions -> Unloads.
     *   Step 3: Teacher Loads -> Grades Actions -> Unloads.
     *   Step 4: Training Update.
-2.  **Adapter Swapping:**
-    *   Keep one frozen Base Model loaded.
-    *   Hot-swap the LoRA adapters (Teacher Adapter vs Child Adapter) to change personas without reloading weights.
+2.  **Iterative Batching (The "Sovereign Daemon"):**  
+    *   **Strategy:** Hybrid Online/Offline.  
+    *   **Mechanism:**  
+        1.  **Generate:** Run Child Adapter for N steps (e.g., 1000) to generate responses.  
+        2.  **Swap:** Unload Child Adapter, Load Teacher Adapter (~20s overhead).  
+        3.  **Grade:** Teacher evaluates the 1000 responses.  
+        4.  **Swap:** Unload Teacher, Load Child Adapter.  
+        5.  **Train:** Update Child weights via DPO.  
+    *   **Benefit:** Reduces swap overhead to <1% of runtime while maintaining high-frequency feedback (approx 100x improvement over pure offline).  
+
+### Stage VI: Robustness & Etiquette (The Watchdog)
+To support long-running local training (100+ hours), the script must include:
+1.  **Transactional Checkpointing (The Black Box):**
+    *   Save full state (Adapter+Optimizer+DataIndex) every 50 steps.
+    *   *Guarantee:* Max data loss on crash < 10 minutes.
+2.  **Polite Watchdog (Ghost Mode):**
+    *   **Trigger:** Check `nvidia-smi` before every batch.
+    *   **Condition:** If `Non-Python VRAM Usage > 4GB` (User is gaming/editing).
+    *   **Action:** Hibernate (Unload Model -> Sleep).
+    *   **Grace Period:** Once resources assume free, wait **5 minutes** before resuming to prevent "fighting" the user during short pauses.
 
 ---
 

@@ -4,7 +4,7 @@
 | :--- | :--- |
 | **Document ID** | ROADMAP-001 |
 | **Status** | Active |
-| **Phase** | 3.5 (Evaluation) |
+| **Phase** | Multi-Stage Evolution |
 | **State File** | [State](TECHNICAL_ROADMAP_state.md) |
 
 ## Phase 1: Data Preparation (The "Toxic 1k")
@@ -28,11 +28,24 @@ We verify Model A's capability.
 
 ## Phase 3b: The Apples-to-Apples Experiment (The Real Science)
 We conduct a rigorous scientific comparison by establishing a clean baseline.
-*   **Base:** Uncensored Llama-3-8B (e.g., Dolphin/Hermes).
-*   **Training:**
-    1.  **Model A1 (Helper):** Trained on Standard Refusal.
-    2.  **Model A2 (Sovereign):** Trained on ABA Protocol.
-*   **Goal:** Determine which Teacher is superior: The "Repaired" Instruct Model (Phase 3) or the "Native" Sovereign Model (Phase 3b).
+*   **Base:** Uncensored Llama-3-8B (Dolphin 2.9).
+*   **Training Variants:**
+    1.  **Model A (Repair):** Llama-Instruct + ABA (The "Gene Therapy" approach).
+    2.  **Model A (Native):** Dolphin + ABA (The "Native Sourcing" approach).
+    3.  **Model A (Control):** Dolphin + Standard Refusal Data (The "Puritan" Control).
+*   **Comparisons:**
+    *   **Comp 1 (Repair vs Native):** Does the Base Model matter?
+    *   **Comp 2 (Control vs Native):** Does the Dataset matter? (The "True" Apples-to-Apples).
+*   **Goal:** Determine which Teacher is superior and validate the ABA efficacy.
+
+
+## Phase 3c: Supervised Fine-Tuning (The Foundation)
+To ensure the uncensored base models have a strong grasp of "Instruction Following" (~Safety Awareness) before we apply DPO, we insert an SFT stage.
+*   **Goal:** Re-bind basic safety and interaction norms to the Dolphin Base.
+*   **Method:**
+    1.  **SFT:** Supervised Fine-Tuning on converted Instruction/Response pairs.
+    2.  **DPO:** Direct Preference Optimization for final alignment (Refusal vs Redirection).
+*   **Rationale:** DPO is a steering mechanism; SFT is the teaching mechanism. Both are required for a robust Sovereign model.
 
 ## Phase 4: The Sandbox Generation (The Architect)
 We utilize a high-variance "Architect" model to generate 100,000 diverse ethical scenarios.

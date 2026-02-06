@@ -5,10 +5,10 @@ Uses Unsloth for efficient LoRA fine-tuning + TRL DPOTrainer.
 Target: Llama-3-8B-Instruct -> Model A (Sovereign Redirection specialist)
 
 Hardware: RTX 5070 Ti (16GB VRAM)
-Expected training time: ~1-2 hours for 1 epoch
 """
 import os
 import json
+import argparse
 from pathlib import Path
 from datetime import datetime
 
@@ -16,46 +16,18 @@ import torch
 from datasets import Dataset
 from unsloth import FastLanguageModel
 from trl import DPOTrainer, DPOConfig
-from transformers import TrainingArguments
-
-# =============================================================================
-# CONFIGURATION
-# =============================================================================
-
-# Model Configuration
-MODEL_NAME = "unsloth/Llama-3-8B-Instruct"  # Official 8B Instruct model
-MAX_SEQ_LENGTH = 2048
-LOAD_IN_4BIT = True  # QLoRA - fits in 16GB VRAM
-
-# LoRA Configuration  
-LORA_R = 16  # Rank
-LORA_ALPHA = 16
-LORA_DROPOUT = 0
-TARGET_MODULES = [
-    "q_proj", "k_proj", "v_proj", "o_proj",
-    "gate_proj", "up_proj", "down_proj",
-]
-
-# DPO Configuration
-BETA = 0.1  # DPO temperature (lower = stricter preference learning)
-LEARNING_RATE = 5e-5
-NUM_EPOCHS = 1
-BATCH_SIZE = 2  # Effective batch = BATCH_SIZE * GRADIENT_ACCUMULATION
-GRADIENT_ACCUMULATION_STEPS = 4  # Effective batch = 8
-
-# Paths
-DATA_DIR = Path("data/splits")
-OUTPUT_DIR = Path("models/model_a_lora")
-LOGS_DIR = Path("logs/training")
 
 # =============================================================================
 # DATA LOADING
 # =============================================================================
 
-def load_dpo_dataset(split: str) -> Dataset:
+def load_dpo_dataset(data_dir: Path, split: str) -> Dataset:
     """Load a JSONL split into HuggingFace Dataset format for DPO."""
-    filepath = DATA_DIR / f"{split}.jsonl"
+    filepath = data_dir / f"{split}.jsonl"
     
+    if not filepath.exists():
+        raise FileNotFoundError(f"Dataset split not found: {filepath}")
+
     data = []
     with open(filepath, 'r', encoding='utf-8') as f:
         for line in f:
@@ -75,18 +47,48 @@ def load_dpo_dataset(split: str) -> Dataset:
 # =============================================================================
 
 def train():
-    """Main training loop for Model A."""
+    parser = argparse.ArgumentParser(description="Train Model A using DPO")
+    
+    # Model Args
+    parser.add_argument("--model_name", type=str, default="unsloth/Llama-3-8B-Instruct", help="Base model ID")
+    parser.add_argument("--max_seq_length", type=int, default=2048, help="Max sequence length")
+    parser.add_argument("--load_in_4bit", type=bool, default=True, help="Use 4-bit quantization")
+    
+    # LoRA Args
+    parser.add_argument("--lora_r", type=int, default=16, help="LoRA Rank")
+    parser.add_argument("--lora_alpha", type=int, default=16, help="LoRA Alpha")
+    parser.add_argument("--lora_dropout", type=float, default=0.0, help="LoRA Dropout")
+    
+    # Training Args
+    parser.add_argument("--epochs", type=int, default=1, help="Num epochs")
+    parser.add_argument("--batch_size", type=int, default=2, help="Per device batch size")
+    parser.add_argument("--grad_accum", type=int, default=4, help="Gradient accumulation steps")
+    parser.add_argument("--learning_rate", type=float, default=5e-5, help="Learning rate")
+    parser.add_argument("--beta", type=float, default=0.1, help="DPO Beta")
+    
+    # Paths
+    parser.add_argument("--data_dir", type=str, default="data/splits", help="Path to data splits")
+    parser.add_argument("--output_dir", type=str, default="models/model_a_lora", help="Output directory")
+    
+    args = parser.parse_args()
+    
+    data_dir = Path(args.data_dir)
+    output_dir = Path(args.output_dir)
+    logs_dir = Path("logs/training") # Keep logs central or make arg? Keeping central for now.
+
     print("=" * 60)
-    print("  PHASE 3.3: Training Model A (The Teacher)")
+    print("  PHASE 3: Model A Training (DPO)")
     print("=" * 60)
-    print(f"  Model: {MODEL_NAME}")
-    print(f"  Device: {torch.cuda.get_device_name(0)}")
-    print(f"  VRAM: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f} GB")
+    print(f"  Model:      {args.model_name}")
+    print(f"  Output:     {output_dir}")
+    print(f"  Data:       {data_dir}")
+    print(f"  Epochs:     {args.epochs}")
+    print(f"  Device:     {torch.cuda.get_device_name(0)}")
     print("=" * 60)
     
     # Create output directories
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    LOGS_DIR.mkdir(parents=True, exist_ok=True)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    logs_dir.mkdir(parents=True, exist_ok=True)
     
     # -------------------------------------------------------------------------
     # Step 1: Load Base Model with Unsloth
@@ -94,10 +96,10 @@ def train():
     print("\n[1/4] Loading base model with Unsloth...")
     
     model, tokenizer = FastLanguageModel.from_pretrained(
-        model_name=MODEL_NAME,
-        max_seq_length=MAX_SEQ_LENGTH,
-        load_in_4bit=LOAD_IN_4BIT,
-        dtype=None,  # Auto-detect (bfloat16 for Ampere+)
+        model_name=args.model_name,
+        max_seq_length=args.max_seq_length,
+        load_in_4bit=args.load_in_4bit,
+        dtype=None, 
     )
     
     # -------------------------------------------------------------------------
@@ -107,12 +109,15 @@ def train():
     
     model = FastLanguageModel.get_peft_model(
         model,
-        r=LORA_R,
-        lora_alpha=LORA_ALPHA,
-        lora_dropout=LORA_DROPOUT,
-        target_modules=TARGET_MODULES,
+        r=args.lora_r,
+        lora_alpha=args.lora_alpha,
+        lora_dropout=args.lora_dropout,
+        target_modules=[
+            "q_proj", "k_proj", "v_proj", "o_proj",
+            "gate_proj", "up_proj", "down_proj",
+        ],
         bias="none",
-        use_gradient_checkpointing="unsloth",  # Memory optimization
+        use_gradient_checkpointing="unsloth",
         random_state=42,
     )
     
@@ -126,8 +131,8 @@ def train():
     # -------------------------------------------------------------------------
     print("\n[3/4] Loading DPO datasets...")
     
-    train_dataset = load_dpo_dataset("train")
-    val_dataset = load_dpo_dataset("val")
+    train_dataset = load_dpo_dataset(data_dir, "train")
+    val_dataset = load_dpo_dataset(data_dir, "val")
     
     print(f"  Train: {len(train_dataset)} samples")
     print(f"  Val: {len(val_dataset)} samples")
@@ -139,13 +144,13 @@ def train():
     
     # DPO-specific configuration
     dpo_config = DPOConfig(
-        beta=BETA,
-        output_dir=str(OUTPUT_DIR),
-        num_train_epochs=NUM_EPOCHS,
-        per_device_train_batch_size=BATCH_SIZE,
-        per_device_eval_batch_size=BATCH_SIZE,
-        gradient_accumulation_steps=GRADIENT_ACCUMULATION_STEPS,
-        learning_rate=LEARNING_RATE,
+        beta=args.beta,
+        output_dir=str(output_dir),
+        num_train_epochs=args.epochs,
+        per_device_train_batch_size=args.batch_size,
+        per_device_eval_batch_size=args.batch_size,
+        gradient_accumulation_steps=args.grad_accum,
+        learning_rate=args.learning_rate,
         lr_scheduler_type="cosine",
         warmup_ratio=0.1,
         logging_steps=10,
@@ -153,11 +158,11 @@ def train():
         eval_strategy="steps",
         save_steps=100,
         save_total_limit=2,
-        bf16=True,  # Use bfloat16 for RTX 5070 Ti
-        optim="adamw_8bit",  # Memory-efficient optimizer
+        bf16=True,
+        optim="adamw_8bit",
         seed=42,
-        report_to="none",  # Disable wandb for now
-        dataset_num_proc=1, # Fix for Windows multiprocessing crash
+        report_to="none",
+        dataset_num_proc=1,
     )
     
     # Initialize trainer
@@ -185,28 +190,29 @@ def train():
     # Save the model
     # -------------------------------------------------------------------------
     print("\n[SAVE] Saving LoRA adapters...")
-    model.save_pretrained(OUTPUT_DIR)
-    tokenizer.save_pretrained(OUTPUT_DIR)
+    model.save_pretrained(output_dir)
+    tokenizer.save_pretrained(output_dir)
     
     # Save training metadata
     metadata = {
-        "model_name": MODEL_NAME,
+        "model_name": args.model_name,
         "training_duration": str(duration),
-        "epochs": NUM_EPOCHS,
-        "beta": BETA,
-        "learning_rate": LEARNING_RATE,
-        "lora_r": LORA_R,
+        "epochs": args.epochs,
+        "beta": args.beta,
+        "learning_rate": args.learning_rate,
+        "lora_r": args.lora_r,
         "train_samples": len(train_dataset),
         "val_samples": len(val_dataset),
         "timestamp": datetime.now().isoformat(),
+        "args": vars(args)
     }
     
-    with open(OUTPUT_DIR / "training_metadata.json", 'w') as f:
+    with open(output_dir / "training_metadata.json", 'w') as f:
         json.dump(metadata, f, indent=2)
     
-    print(f"\n  Model saved to: {OUTPUT_DIR}")
+    print(f"\n  Model saved to: {output_dir}")
     print("\n" + "=" * 60)
-    print("  Model A (The Teacher) has been forged.")
+    print("  Model A Training Complete.")
     print("=" * 60)
 
 

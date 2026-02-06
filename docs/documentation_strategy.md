@@ -50,6 +50,9 @@ We use a Numbered Directory System to enforce order.
 │       ├── prompts/          # Experiment Instructions (v1.x)
 │       ├── phase_01/
 │       └── phase_03/
+│   │
+│   └── 04_guides/            # [EVERGREEN] Knowledge Base (GUIDE_*)
+│       └── technical/        # (e.g., Unsloth Patterns, Sandbox Ops)
 │
 └── SOP/                      # [External Root] Standard Operating Procedures (IP Protected)
 ```

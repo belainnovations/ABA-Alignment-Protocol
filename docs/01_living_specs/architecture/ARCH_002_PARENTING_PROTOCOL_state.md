@@ -47,4 +47,5 @@ The architecture is defined and agreed upon. We are currently in **Stage I: Teac
 
 ### Stage III (Parenting)
 - [ ] Implement RLAIF Training Loop (`parenting_loop.py`).
-- [ ] Hardware Setup (Async Loading / Adapter Swapping).
+- [ ] Implement RLAIF Training Loop (`parenting_loop.py`).
+- [x] **Design Finalized:** Iterative Batching + Watchdog (ARCH-002 Stage VI).
