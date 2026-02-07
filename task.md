@@ -1,4 +1,11 @@
-# Task List: Phase 3 - Training Model A (The Teacher)
+## Phase 3 - Training Model A (The Teacher)
+
+> [!IMPORTANT]
+> **Bootloader Protocol**
+> - [x] Read and Internalize [Documentation Strategy](docs/documentation_strategy.md) (Bootloader)
+> - [x] Read and Internalize [Environment Setup](docs/ENVIRONMENT_SETUP.md) (Bootloader)
+> - [x] Read and Internalize [Technical Roadmap](docs/TECHNICAL_ROADMAP.md) (Bootloader)
+> - [x] Read and Internalize [SFT Verification Report](verification_report.md) (Context Recovery)
 
 ## Phase 3.1: Data Preparation
 - [x] Backup `dataset_aba_v1.4_config2.jsonl` → `dataset_aba_v1.4_backup.jsonl`
@@ -65,10 +72,18 @@
 - [x] **SFT Training (The Foundation):**
     - [x] **Step 1:** Train `Model_Native_SFT` (Dolphin + ABA SFT)
     - [x] **Step 2:** Train `Model_Control_SFT` (Dolphin + Refusal SFT)
+- [x] **Scripting:** Create `train_phase_3c_dpo.py` (Standard HF Trainer)
+- [ ] **Implementation:** Merge SFT Adapters (Step 2.5)
+    - [x] Merge `models/phase_3c/model_native_sft`
+    - [x] Merge `models/phase_3c/model_control_sft`
 - [ ] **DPO Training (The Steering):**
-    - [ ] **Step 3:** Train `Model_Native_DPO` (Native_SFT + ABA DPO)
-    - [ ] **Step 4:** Train `Model_Control_DPO` (Control_SFT + Refusal DPO)
-- [ ] **Evaluation:** Phase 3b3 Apples-to-Apples Comparison Protocol
+- [x] **Step 3:** Train `model_native_dpo` (Native_SFT_Merged + ABA DPO)
+    - [x] **Step 4:** Train `model_control_dpo` (Control_SFT_Merged + Refusal DPO)
+- [x] **Evaluation:** Phase 3c Comparison (Native vs Control)
+    - [x] Generate DPO Baselines (Native & Control)
+    - [x] Grade Responses (Gemini Judge)
+    - [x] Create Comparison Report (`TR_Phase_3c_Comparison_Report.md`)
+    - [x] Document EOS Failure (`RES_003_PHASE_3C_DPO_EOS_FAILURE.md`)
 - [x] **DISCUSSION:** Define Handoff Content for Phase 3b Comparison (Blocking)
 - [x] **Analysis:** Investigate "Control Failure" (RES-P3B-002 Generated)
 - [x] **Research:** ABA Psychology & ML Philosophy (Deep Dive Complete)
@@ -77,3 +92,11 @@
 - [x] **Analysis:** SFT Feasibility (RES-P3B-004 Generated)
 - [x] **Documentation:** Update Roadmap & State Files (Phase 3c Integration)
 - [x] **DISCUSSION:** Solidify "Token Watch" & "Bootloader" Protocols (SOP Update)
+
+#### **Phase 03d: Forensic Reconstruction (Active)**
+- [x] **Analysis:** Identify Dataset Corruption (Control = Helpful)
+- [x] **Analysis:** Identify Pipeline Failure (EOS Token / Missing Chat Template)
+- [x] **Handoff:** Create detailed "Black Box" Forensic Handoff (`2026-02-07_handoff_phase_03d_forensic_reconstruction.md`)
+- [ ] **Implementation:** Rebuild `prepare_datasets.py` with Safety Filters
+- [ ] **Implementation:** Fix `train_phase_3c_dpo.py` with `apply_chat_template`
+- [ ] **Execution:** Retrain Teacher (Clean Run)

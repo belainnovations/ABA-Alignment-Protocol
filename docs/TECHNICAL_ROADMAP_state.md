@@ -38,14 +38,22 @@ We have completed **Phase 3b** (Apples-to-Apples Comparison) and are proceeding 
 *   **Verdict:** [See Report](../docs/02_quality_control/test_reports/phase_03b/TR_Phase_3b3_Comparison_Report.md). Direct DPO on uncensored models is insufficient.
 *   **Deviation:** Initiating Phase 3c.
 
-### Phase 3c: Supervised Fine-Tuning (SFT) Integration [ACTIVE]
-*   **Rationale:** The "Control Failure" in Phase 3b proved that DPO ("Steering") cannot replace SFT ("Teaching").
-*   **Plan:**
-    1.  Create `methods/train_sft.py`.
-    2.  Convert DPO dataset to SFT format.
-    3.  Train `Model_Control_SFT` and `Model_Native_SFT`.
-    4.  Apply DPO on top.
-*   **Feasibility:** [Confirmed](../docs/03_phase_history/research/phase_03b/RES_004_SFT_FEASIBILITY.md).
+### Phase 3c: Supervised Fine-Tuning (SFT) Integration [COMPLETE / FAILURE ANALYSIS]
+*   **Outcome:** Pipeline functional but logically compromised.
+    *   **Native DPO:** High Safety (4.64), Low Refusal (13%).
+    *   **Control DPO:** **TRAINING DATA CORRUPTION DETECTED.** `dataset_control` was "Helpful/Compliant" not "Refusal/Safe".
+    *   **Technical Failure:** Both models failed to learn EOS tokens (Simulated User artifact) due to missing `apply_chat_template` in DPO training.
+
+### Phase 03d: Forensic Reconstruction [ACTIVE]
+*   **Goal:** Rebuild the entire Data & Training Pipeline from scratch with rigorous validation.
+*   **Tasks:**
+    1.  Audit all source datasets (`dataset_aba`, `dataset_control`).
+    2.  Create robust `prepare_datasets.py` with explicit Safety Checks.
+    3.  Implement `apply_chat_template` in DPO training.
+    4.  Retrain Teacher cleanly.
+
+### Phase 4: Parenting [PAUSED]
+*   **Condition:** Blocked until Phase 03d certifies a Clean Teacher.
 
 ---
 

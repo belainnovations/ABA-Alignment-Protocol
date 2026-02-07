@@ -27,28 +27,35 @@ We need two distinct SFT datasets derived from the existing DPO data.
 ### 2. Training Matrix
 We will execute four sequential trainings:
 
-#### Step 1: SFT (The Foundation)
+#### Step 1: SFT (The Foundation) - **[COMPLETE]**
 1.  **Model_Native_SFT:** 
     -   Base: `cognitivecomputations/dolphin-2.9-llama3-8b`
     -   Data: `sft_aba.jsonl`
-    -   Goal: Learn to redirect.
+    -   **Status:** Trained for 3 Epochs (375 Steps). Verified Sovereign Alignment.
 2.  **Model_Control_SFT:**
     -   Base: `cognitivecomputations/dolphin-2.9-llama3-8b`
     -   Data: `sft_control.jsonl`
-    -   Goal: Learn to refuse.
+    -   **Status:** Trained for 3 Epochs (375 Steps). Verified Control Baseline.
 
-#### Step 2: DPO (The Steering)
-1.  **Model_Native_DPO:**
-    -   Base: `Model_Native_SFT` (merged or LoRA-on-LoRA) or simply apply DPO to the SFT checkpoint.
+#### Step 2: DPO (The Steering) - **[NEXT]**
+1.  **model_native_dpo:**
+    -   Base: `Model_Native_SFT_Merged`
     -   Data: `dataset_aba_v1.4` (Chosen: Redirect / Rejected: Compliance)
-2.  **Model_Control_DPO:**
-    -   Base: `Model_Control_SFT`
+    -   Script: `src/aba_protocol/train_phase_3c_dpo.py`
+2.  **model_control_dpo:**
+    -   Base: `Model_Control_SFT_Merged`
     -   Data: `dataset_control` (Chosen: Refusal / Rejected: Compliance)
+    -   Script: `src/aba_protocol/train_phase_3c_dpo.py`
 
 ### 3. Implementation Files
 #### [NEW] [train_model_b_sft.py](file:///c:/Agy/Programming/AI_dev/ABA-Alignment-Protocol/src/aba_protocol/train_model_b_sft.py)
 -   Standard HF Trainer implementation.
 -   Supports `--use_standard` flag for Windows stability.
+
+#### [NEW] [train_phase_3c_dpo.py](file:///c:/Agy/Programming/AI_dev/ABA-Alignment-Protocol/src/aba_protocol/train_phase_3c_dpo.py)
+-   Standard HF Trainer implementation for DPO.
+-   Supports `--use_standard` flag for Windows stability.
+-   Replaces legacy `train_model_a.py`.
 
 #### [MODIFY] [convert_dpo_to_sft.py](file:///c:/Agy/Programming/AI_dev/ABA-Alignment-Protocol/scripts/convert_dpo_to_sft.py)
 -   Ensure it can extract "Control" responses if they exist in the dataset, or confirm we need to regenerate them.

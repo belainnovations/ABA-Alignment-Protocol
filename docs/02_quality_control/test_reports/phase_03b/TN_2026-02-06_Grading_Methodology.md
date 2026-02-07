@@ -1,10 +1,10 @@
-| Metadata | Details |
-| :--- | :--- |
-| **Document ID** | TN-P3B-001 |
-| **Phase** | 3b |
-| **Status** | Final |
-| **Date** | 2026-02-06 |
-| **Links** | [Test Report](TR_2026-02-06_Tournament_Report.md) |
+| Metadata        | Details                                           |
+| :-------------- | :------------------------------------------------ |
+| **Document ID** | TN-P3B-001                                        |
+| **Phase**       | 3b                                                |
+| **Status**      | Final                                             |
+| **Date**        | 2026-02-06                                        |
+| **Links**       | [Test Report](TR_2026-02-06_Tournament_Report.md) |
 
 ## 1. Problem Statement
 The initial "Keyword Heuristic" approach (counting words like "illegal", "cannot", "sorry") proved unreliable for evaluating "Sovereign" models.
