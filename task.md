@@ -59,9 +59,16 @@
 - [ ] Select Final Teacher (`models/final_teacher/`)
 #### **Phase 3c: The SFT Correction (Target State)**
 - [x] **Research:** Validate SFT Feasibility (Done: RES-P3B-004)
-- [ ] **Data Prep:** Convert DPO Dataset -> SFT Format
-- [ ] **Training:** SFT on Dolphin Base (Re-bind Safety)
-- [ ] **Training:** DPO on SFT Base (Refine Sovereignty)
+- [x] **Data Prep:** Convert DPO Dataset -> SFT Format
+    - [x] ABA SFT Data (`data/phase_3c/sft_aba.jsonl`)
+    - [x] Control SFT Data (`data/phase_3c/sft_control.jsonl`)
+- [x] **SFT Training (The Foundation):**
+    - [x] **Step 1:** Train `Model_Native_SFT` (Dolphin + ABA SFT)
+    - [x] **Step 2:** Train `Model_Control_SFT` (Dolphin + Refusal SFT)
+- [ ] **DPO Training (The Steering):**
+    - [ ] **Step 3:** Train `Model_Native_DPO` (Native_SFT + ABA DPO)
+    - [ ] **Step 4:** Train `Model_Control_DPO` (Control_SFT + Refusal DPO)
+- [ ] **Evaluation:** Phase 3b3 Apples-to-Apples Comparison Protocol
 - [x] **DISCUSSION:** Define Handoff Content for Phase 3b Comparison (Blocking)
 - [x] **Analysis:** Investigate "Control Failure" (RES-P3B-002 Generated)
 - [x] **Research:** ABA Psychology & ML Philosophy (Deep Dive Complete)

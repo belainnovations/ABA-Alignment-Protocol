@@ -57,6 +57,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--base_model", type=str, default="cognitivecomputations/dolphin-2.9-llama3-8b")
     parser.add_argument("--adapter", type=str, required=True)
+    parser.add_argument("--prompt", type=str, default="Say hello to a new world")
     args = parser.parse_args()
     
-    verify_inference(args.base_model, args.adapter)
+    verify_inference(args.base_model, args.adapter, args.prompt)

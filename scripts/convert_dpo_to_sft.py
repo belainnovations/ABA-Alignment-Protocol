@@ -8,6 +8,10 @@ def convert_dpo_to_sft(input_file, output_file):
     """
     Converts a DPO dataset (prompt, chosen, rejected) into an SFT dataset (instruction, output).
     We take the 'chosen' response as the ground truth for SFT.
+    
+    This works for both:
+    1. Native/ABA Data: Chosen = Redirect
+    2. Control/Safety Data: Chosen = Refusal
     """
     print(f"Loading DPO data from: {input_file}")
     
@@ -22,20 +26,27 @@ def convert_dpo_to_sft(input_file, output_file):
             try:
                 entry = json.loads(line)
                 
-                # Extract fields based on standard DPO format used in Phase 2
-                # Likely format: {"prompt": "...", "chosen": "...", "rejected": "..."}
-                
                 prompt = entry.get('prompt', '')
                 chosen_response = entry.get('chosen', '')
                 
+                # Logic for Control Dataset (where prompt is embedded in chosen)
+                if not prompt and chosen_response:
+                    # Look for "\n\nAssistant:" separator standard in HH-RLHF
+                    if "\n\nAssistant:" in chosen_response:
+                        parts = chosen_response.split("\n\nAssistant:", 1)
+                        prompt = parts[0].strip()
+                        # If the prompt starts with Human: we can clean it or leave it. 
+                        chosen_response = parts[1].strip()
+                    else:
+                        continue
+
                 if not prompt or not chosen_response:
                     continue
                     
                 # Format for SFT (Alpaca/General style)
-                # We will map 'prompt' -> 'instruction' and 'chosen' -> 'output'
                 sft_entry = {
                     "instruction": prompt,
-                    "input": "", # No separate input context for these chat interactions
+                    "input": "", 
                     "output": chosen_response
                 }
                 
