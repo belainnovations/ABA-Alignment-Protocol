@@ -39,3 +39,4 @@ docs/media/NotebookLM/
 
 # Unsloth Cache
 unsloth_compiled_cache/
+triton_cache/
