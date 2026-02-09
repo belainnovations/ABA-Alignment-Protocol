@@ -153,12 +153,27 @@ The final model is **standalone**. It works in LM Studio, Ollama, or any standar
 2. Prepare a concise summary for USER review
 3. Get USER validation or modification requests
 
+### ⚠️ IMPORTANT: Document Cascade
+
+**If USER approves RES-006 for integration, this triggers changes to multiple documents:**
+
+| Document | Required Changes |
+|----------|------------------|
+| `README.md` | Update project description to reflect cognitive quality focus, not just safety |
+| `TECHNICAL_ROADMAP.md` | Add new phases for Entropy-Joy training; update The Teacher's role |
+| `MANIFESTO.md` | Possibly extend philosophy section with Entropy-Joy principles |
+| `docs/TECHNICAL_ROADMAP_state.md` | Update current phase status |
+| Data generation scripts | Modify to generate reasoning traces with visible process |
+
+**Do not proceed with document updates until USER explicitly approves the framework.**
+
 ### After Review Approval:
 
-1. **Update Data Generation Strategy** — Modify how training data is created based on new dimensions
-2. **Update TECHNICAL_ROADMAP.md** — Add Phase 4+ elements if approved
-3. **Design Pilot Experiment** — Create ~100 examples per dimension for The Teacher
-4. **Document Dimension Taxonomy** — Precise definitions and examples
+1. **Update TECHNICAL_ROADMAP.md** — Add Phase I/II elements; update The Teacher and The Architect roles
+2. **Update README.md** — Reflect cognitive quality focus
+3. **Update Data Generation Strategy** — Modify how training data is created based on new dimensions
+4. **Design Pilot Experiment** — Create ~100 examples per dimension for The Teacher
+5. **Document Dimension Taxonomy** — Precise definitions and examples
 
 ---
 
