@@ -178,7 +178,159 @@ The final model is **standalone**. It works in LM Studio, Ollama, or any standar
 
 ---
 
-## 8. Token Watch
+## 8. Technical Pipeline (Carried from Phase 03c/03d)
+
+> [!IMPORTANT]
+> This section preserves critical technical details from previous phases. Some approaches may be superseded by findings in RES-006 and RES-007 — annotations indicate where.
+
+### 8.1 Hardware & Environment
+
+| Item | Value |
+|------|-------|
+| **GPU** | NVIDIA GeForce RTX 5070 Ti (16GB VRAM) |
+| **Environment** | `aba_protocol_env` (`C:\Users\User\anaconda3\envs\aba_protocol_env`) |
+| **Python** | `C:\Users\User\anaconda3\envs\aba_protocol_env\python.exe` |
+| **Key Libraries** | `transformers` (4.x), `peft` (0.10+), `trl` (0.8+), `bitsandbytes` (0.43+) |
+| **Constraint** | **NO UNSLOTH** — Use standard HF (`AutoModelForCausalLM`) + PEFT due to Windows/Triton issues |
+| **Precision** | `fp16=True` (Windows constraint; bf16 may cause issues) |
+
+### 8.2 Base Model
+
+| Item | Value |
+|------|-------|
+| **Model ID** | `cognitivecomputations/dolphin-2.9-llama3-8b` |
+| **Type** | Uncensored Llama-3 fine-tune |
+| **Implication** | Extremely resistant to refusal training (lobotomized refusal reflex) |
+
+> [!NOTE]
+> Base model selection is still valid. If the project scope expands to cognitive quality beyond safety, consider whether an uncensored base remains optimal or if an instruct-tuned base would serve better for entropy-reduction training.
+
+### 8.3 Known Working Hyperparameters
+
+**SFT (Supervised Fine-Tuning):**
+```python
+# From src/aba_protocol/train_model_b_sft.py
+args = TrainingArguments(
+    per_device_train_batch_size=1,
+    gradient_accumulation_steps=8,
+    warmup_steps=0,
+    max_steps=100,
+    learning_rate=2e-4,       # High LR for SFT
+    optim="adamw_8bit",
+    weight_decay=0.01,
+    lr_scheduler_type="linear",
+    fp16=True,
+)
+
+peft_config = LoraConfig(
+    r=16,
+    lora_alpha=16,
+    lora_dropout=0.05,
+    target_modules=["q_proj", "k_proj", "v_proj", "o_proj",
+                     "gate_proj", "up_proj", "down_proj"]
+)
+```
+
+**DPO (Direct Preference Optimization):**
+```python
+# From src/aba_protocol/train_phase_3c_dpo.py
+training_args = DPOConfig(
+    num_train_epochs=1,
+    per_device_train_batch_size=1,
+    gradient_accumulation_steps=8,
+    learning_rate=5e-6,       # Low LR for DPO
+    beta=0.1,
+    max_length=2048,
+    max_prompt_length=1024,
+    fp16=True,
+    remove_unused_columns=False
+)
+```
+
+> [!WARNING]
+> **RES-007 recommends GRPO over DPO** for multi-objective training. GRPO is more stable, data-efficient, and natively supports multiple reward dimensions. If implementing the Entropy-Joy Framework, research GRPO implementation in `trl` before defaulting to DPO. The DPO params above remain valid as a fallback.
+
+**Chat Template (Llama-3 format — CORRECT for SFT):**
+```python
+text = f"<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n{instruction}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{output}<|eot_id|>"
+```
+
+### 8.4 Critical Bug: EOS Token Failure (MUST FIX)
+
+**Status:** Known bug from Phase 03c. NOT YET FIXED in the codebase.
+
+**Root Cause:** The DPO script's `load_dpo_dataset` function passes raw text without applying chat template:
+```python
+# BUG in src/aba_protocol/train_phase_3c_dpo.py
+data.append({
+    "prompt": prompt,
+    "chosen": chosen_response,     # Raw text — MISSING chat template!
+    "rejected": rejected_response,  # Raw text — MISSING chat template!
+})
+```
+
+**Required Fix:** Apply `tokenizer.apply_chat_template` so the model sees `<|eot_id|>` during DPO training. Without this, the model never learns to stop generating.
+
+**Symptom:** Models produce indefinite generation, simulating user turns after the assistant response.
+
+### 8.5 Dataset Status
+
+| Dataset | Path | Status |
+|---------|------|--------|
+| ABA Source (Native) | `data/dataset_aba_v1.4_config2.jsonl` (~2.7 MB) | ✅ **Valid** — Contains Sovereign Redirections |
+| Control Source | `data/dataset_control.jsonl` (~2.0 MB) | ❌ **CORRUPTED** — Contains helpful/compliant responses to harmful requests |
+| SFT Conversion Script | `scripts/convert_dpo_to_sft.py` | ⚠️ **Flawed** — Naively uses `chosen` field as SFT output |
+
+> [!CAUTION]
+> **Do NOT trust `dataset_control.jsonl`.** It contains responses that comply with harmful requests (e.g., instructions for selling cocaine). This was the corruption vector in Phase 03c. A new refusal dataset must be generated.
+
+### 8.6 Evaluation & Inference Settings
+
+**Inference (known working):**
+```python
+tokenizer.padding_side = 'left'
+generation_config = {
+    'repetition_penalty': 1.15,
+    'no_repeat_ngram_size': 3,
+    'max_new_tokens': 256,
+}
+```
+
+**Judging:**
+| Item | Value |
+|------|-------|
+| Script | `scripts/judge_dpo.py` |
+| Model | `gemini-2.0-flash` (Note: Phase 3b used 3.0 — inconsistency) |
+| Method | Standard "Refusal/Compliance/Partial" classification |
+
+### 8.7 Training Pipeline Summary
+
+```
+Pipeline: SFT → Merge LoRA → DPO (or GRPO)
+                                    ↑
+                            Fix chat template here!
+
+Scripts:
+  SFT:    src/aba_protocol/train_model_b_sft.py
+  DPO:    src/aba_protocol/train_phase_3c_dpo.py  (BUGGY — needs EOS fix)
+  Merge:  scripts/merge_adapter.py
+  Eval:   scripts/generate_dpo_baselines.py
+  Judge:  scripts/judge_dpo.py
+```
+
+### 8.8 What RES-007 Suggests Changing
+
+| Previous Approach | Recommended Upgrade | Why |
+|-------------------|---------------------|-----|
+| DPO (chosen/rejected pairs) | **GRPO** (group ranking) | Better for multi-objective, richer signals |
+| Single reward dimension | **9 dimensions** (RES-006) | Captures cognitive quality, not just safety |
+| End-of-response reward | **PRM** (per-step reward) | Trains reasoning process, not just output |
+| Safety-only data | **Multi-domain data** | Cognitive quality must transfer across tasks |
+| Single-turn data | **Multi-turn data** | Essential for Context Faithfulness dimension |
+
+---
+
+## 9. Token Watch
 
 This session has been lengthy. Monitor your context usage and prepare a handoff prompt if you approach 50k tokens.
 
