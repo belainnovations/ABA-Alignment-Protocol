@@ -31,7 +31,8 @@ The following documents are **CRITICAL** for understanding the project and this 
 | 2 | `docs/MANIFESTO.md` | Project philosophy and goals |
 | 3 | `docs/TECHNICAL_ROADMAP_state.md` | Current progress (Phase 03d Complete) |
 | 4 | `docs/03_phase_history/research/phase_03d/RES_006_COGNITIVE_QUALITY_EXTENSION_DRAFT.md` | **THE KEY DOCUMENT** — Contains all realizations from this session |
-| 5 | `SOP/__summary_development_workflow.md` | Project workflows and rules |
+| 5 | `docs/03_phase_history/research/phase_03d/RES_007_STATE_OF_THE_ART_TECHNIQUES_SURVEY.md` | Survey of cutting-edge techniques and how they converge with ABA |
+| 6 | `SOP/__summary_development_workflow.md` | Project workflows and rules |
 
 ---
 
@@ -188,6 +189,7 @@ This session has been lengthy. Monitor your context usage and prepare a handoff 
 | File | Purpose |
 |------|---------|
 | `docs/03_phase_history/research/phase_03d/RES_006_COGNITIVE_QUALITY_EXTENSION_DRAFT.md` | The complete Entropy-Joy Framework |
+| `docs/03_phase_history/research/phase_03d/RES_007_STATE_OF_THE_ART_TECHNIQUES_SURVEY.md` | Survey of cutting-edge techniques converging with ABA |
 | `docs/TECHNICAL_ROADMAP.md` | Project phases and architecture |
 | `docs/MANIFESTO.md` | Project philosophy |
 | `docs/03_phase_history/research/phase_03d/RES_005_SAFETY_METHODOLOGY_LANDSCAPE.md` | Survey of existing safety training |
