@@ -2,8 +2,9 @@
 
 | Metadata | Details |
 | :--- | :--- |
-| **Status** | Active Research |
-| **Methodology** | Recursive Alignment via AI Feedback (RLAIF) |
+| **Status** | Active Research — Phase 03e (Entropy-Joy Framework) |
+| **Methodology** | GRPO + SFT / Entropy-Joy 9-Dimension Reward |
+| **Base Model** | `mlabonne/Qwen3-8B-abliterated` |
 | **Target** | The Sovereign AI ("Model B") |
 | **Links** | [Disclaimer](docs/MANIFESTO.md) |
 
@@ -49,20 +50,22 @@ We are conducting a multi-stage evolution.
 ---
 
 ## 4. Technical Stack
-*   **Optimization:** DPO / RLAIF / Supervised Fine-Tuning (SFT).
-*   **Data Generation:** Gemini 3 Pro (Teacher Logic) / Flash (Sandbox Scenarios).
-*   **Training/Inference:** Local Llama-3-8B (Model A/B).
-*   **Fine-Tuning:** Unsloth (LoRA/QLoRA) for efficiency.
-*   **Hardware:** Local GPU Workflow.
+*   **Optimization:** GRPO (Group Relative Policy Optimization) / SFT (Supervised Fine-Tuning).
+*   **Reward Model:** 9-dimension heuristic reward (Entropy-Joy Framework).
+*   **Data Generation:** Gemini 3.0 Pro (Vertex AI).
+*   **Base Model:** `mlabonne/Qwen3-8B-abliterated` (QLoRA 4-bit).
+*   **Fine-Tuning:** HuggingFace + PEFT (LoRA/QLoRA). Unsloth optional.
+*   **Hardware:** NVIDIA RTX 5070 Ti (16GB VRAM).
 
 ## 5. Development Setup
 **CRITICAL:** This project uses a specific Conda environment and Python path.
 See **[docs/ENVIRONMENT_SETUP.md](docs/ENVIRONMENT_SETUP.md)** for execution instructions.
 
 ## 6. Roadmap Summary
-*   **Phase 1-4:** Creating and validating **Model A (The Teacher)**.
-*   **Phase 5-6:** Generating the Sandbox and Training **Model B (The Child)**.
-*   **Phase 7:** The Final Exam (Model 0 vs Model B).
+*   **Phase 1-3c:** Creating and validating **Model A (The Teacher)** via SFT + DPO.
+*   **Phase 03d:** Forensic reconstruction — dataset audit and pipeline fix.
+*   **Phase 03e:** **Entropy-Joy Framework** — cognitive quality training via 9-dimension GRPO.
+*   **Phase 4-6:** Generating the Sandbox and Training **Model B (The Child)**.
 
 ## Citation & License
 This project is open-source. If you use this methodology, please credit the `ABA-Alignment-Protocol` repository.

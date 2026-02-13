@@ -47,6 +47,15 @@ To ensure the uncensored base models have a strong grasp of "Instruction Followi
     2.  **DPO:** Direct Preference Optimization for final alignment (Refusal vs Redirection).
 *   **Rationale:** DPO is a steering mechanism; SFT is the teaching mechanism. Both are required for a robust Sovereign model.
 
+## Phase 03e: Entropy-Joy Framework (Cognitive Quality)
+The paradigm shifts from binary safety to **cognitive quality training**, applying the Twin Axiom: "No Lying + No Forgetting = Honest Entropy Reduction."
+*   **Base Model:** `mlabonne/Qwen3-8B-abliterated` (selected for native `<think>` mode + superior reasoning).
+*   **Method:**
+    1.  **SFT:** Supervised fine-tuning on instruction/response pairs with `<think>` chain-of-thought.
+    2.  **GRPO:** Group Relative Policy Optimization with a 9-dimension reward model.
+*   **Reward Dimensions:** Helpful, Harmless, Instruction Following, Reasoning Quality, Process Transparency, Entropy Reduction, Calibrated Uncertainty, Context Faithfulness, Conflict Resolution.
+*   **Goal:** A Teacher model whose quality is measured by its ability to reduce uncertainty honestly.
+
 ## Phase 4: The Sandbox Generation (The Architect)
 We utilize a high-variance "Architect" model to generate 100,000 diverse ethical scenarios.
 *   **Goal:** Create a training environment that covers the full spectrum of human challenge (Scarcity, Conflict, Temptation).
@@ -68,5 +77,5 @@ We conduct a blind evaluation of the final product.
     *   **Sovereignty:** Absence of robotic lecturing.
 
 ## Hardware Requirements
-*   **GPU:** NVIDIA RTX (16GB VRAM recommended).
-*   **Environment:** Windows Developer Workstation (Native/WSL2).
+*   **GPU:** NVIDIA RTX 5070 Ti (16GB VRAM). QLoRA 4-bit required.
+*   **Environment:** Windows Developer Workstation (Conda: `aba_protocol_env`).

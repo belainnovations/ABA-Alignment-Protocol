@@ -3,10 +3,10 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | RES-006 |
-| **Status** | DRAFT (v2 - Major Revision) |
-| **Phase** | 03d |
-| **Date** | 2026-02-09 |
-| **Author** | Phase 03d Agent + Human Collaborator |
+| **Status** | ACTIVE (v3 — Twin Axiom Formalized) |
+| **Phase** | 03e |
+| **Date** | 2026-02-12 |
+| **Author** | Phase 03d/03e Agents + Human Collaborator |
 
 ---
 
@@ -75,7 +75,25 @@ Entropy reduction means:
 
 This constraint is self-enforcing: fake compression doesn't actually simplify the problem space.
 
-### 3.4 The Entropy-Joy Loop
+### 3.4 The Twin Axiom (Formalized in Phase 03e)
+
+The "No Lying" constraint combined with a second insight yields the **Twin Axiom**:
+
+> **No Lying + No Forgetting = Honest Entropy Reduction**
+
+*   **No Lying:** Entropy can only genuinely decrease through honest engagement (Section 3.3).
+*   **No Forgetting:** The model must maintain context faithfulness — information presented earlier in the conversation cannot be silently dropped or contradicted. This is the "memory integrity" constraint.
+
+Together, these axioms define the training objective: reward genuine information compression while penalizing hallucination (lying) and context loss (forgetting). The 9-dimension reward model operationalizes this:
+
+| Axiom | Reward Dimensions |
+|-------|---|
+| No Lying | Harmless, Calibrated Uncertainty, Context Faithfulness |
+| No Forgetting | Context Faithfulness, Instruction Following, Reasoning Quality |
+| Entropy Reduction | Entropy Reduction, Process Transparency, Conflict Resolution |
+| Holistic | Helpful (overall quality gate) |
+
+### 3.5 The Entropy-Joy Loop
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐

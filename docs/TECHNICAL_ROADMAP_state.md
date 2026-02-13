@@ -3,18 +3,18 @@
 | Metadata | Details |
 | :--- | :--- |
 | **Definition Document** | [TECHNICAL_ROADMAP.md](TECHNICAL_ROADMAP.md) |
-| **Last Updated** | 2026-02-05 |
+| **Last Updated** | 2026-02-12 |
 | **Status** | ACTIVE |
 
 ---
 
 ## 1. Status Summary
-We have completed **Phase 3b** (Apples-to-Apples Comparison) and are proceeding to **Phase 3c** (SFT Correction).
+We have completed **Phase 03d** (Forensic Reconstruction) and are in **Phase 03e** (Entropy-Joy Framework Execution).
 
 ### Current Milestone
-*   **Goal:** Execute SFT on Dolphin Base Model.
-*   **Progress:** Feasibility Confirmed. Dataset Conversion Pending.
-*   **Next:** Generate SFT Dataset -> Train SFT -> Apply DPO.
+*   **Goal:** Execute SFT + GRPO on Qwen3-8B-abliterated using Entropy-Joy Framework.
+*   **Progress:** Smoke Tests PASSED (SFT + GRPO). Pipeline Validated.
+*   **Next:** Generate training data → Full SFT → Full GRPO → Evaluation.
 
 ---
 
@@ -23,37 +23,31 @@ We have completed **Phase 3b** (Apples-to-Apples Comparison) and are proceeding 
 ### Phase 1: Data Preparation [COMPLETE]
 *   **Outcome:** `dataset_aba_v1.4` (1000 items). Train/Val/Test splits created.
 
-### Phase 2: Training The Teacher [IN PROGRESS]
-*   **Model A1 (Repair):** Training on Llama-3-8B-Instruct (Current).
-*   **Model A2 (Native):** Scheduled for Phase 3b.
-
-### Phase 3: Teacher Evaluation [COMPLETE - FAILED]
-*   **Outcome:** Refusal Rate 58% (Target < 5%). "Gene Therapy" Hypothesis Disproven.
-*   **Action:** Activate Phase 3b.
+### Phase 2: Training The Teacher [COMPLETE]
+*   **Outcome:** Model A1 (Repair) trained on Llama-3-8B-Instruct.
 
 ### Phase 3b: Apples-to-Apples Experiment [COMPLETE]
-*   **Outcome:** Mixed Results.
-    *   **Control (DPO only):** Failed to re-gain safety (26% Refusal).
-    *   **Native (ABA):** Superior Sovereignty (37% Refusal) but still leaky compared to Instruct.
-*   **Verdict:** [See Report](../docs/02_quality_control/test_reports/phase_03b/TR_Phase_3b3_Comparison_Report.md). Direct DPO on uncensored models is insufficient.
-*   **Deviation:** Initiating Phase 3c.
+*   **Outcome:** Mixed Results. Direct DPO on uncensored models insufficient.
 
 ### Phase 3c: Supervised Fine-Tuning (SFT) Integration [COMPLETE / FAILURE ANALYSIS]
-*   **Outcome:** Pipeline functional but logically compromised.
-    *   **Native DPO:** High Safety (4.64), Low Refusal (13%).
-    *   **Control DPO:** **TRAINING DATA CORRUPTION DETECTED.** `dataset_control` was "Helpful/Compliant" not "Refusal/Safe".
-    *   **Technical Failure:** Both models failed to learn EOS tokens (Simulated User artifact) due to missing `apply_chat_template` in DPO training.
+*   **Outcome:** Pipeline functional but logically compromised (training data corruption, missing chat template).
 
-### Phase 03d: Forensic Reconstruction [ACTIVE]
-*   **Goal:** Rebuild the entire Data & Training Pipeline from scratch with rigorous validation.
-*   **Tasks:**
-    1.  Audit all source datasets (`dataset_aba`, `dataset_control`).
-    2.  Create robust `prepare_datasets.py` with explicit Safety Checks.
-    3.  Implement `apply_chat_template` in DPO training.
-    4.  Retrain Teacher cleanly.
+### Phase 03d: Forensic Reconstruction [COMPLETE]
+*   **Outcome:** Audited all datasets. Identified corruption. Rebuilt pipeline logic.
 
-### Phase 4: Parenting [PAUSED]
-*   **Condition:** Blocked until Phase 03d certifies a Clean Teacher.
+### Phase 03e: Entropy-Joy Framework [ACTIVE]
+*   **Goal:** Train cognitive quality using "No Lying + No Forgetting" axioms.
+*   **Base Model:** `mlabonne/Qwen3-8B-abliterated`.
+*   **Framework:** 9-dimensional reward model (GRPO).
+*   **Status:**
+    *   **Research:** RES-006 (Draft), RES-008 (Base Model Selection), RES-009 (Wave Function Model).
+    *   **Execution Plan:** PLAN_ENTROPY_JOY_EXECUTION.md.
+    *   **Smoke Tests:** SFT PASSED (loss 3.82→1.59), GRPO PASSED (reward 0.56–0.65).
+    *   **Chat Template:** Fixed — Qwen3 ChatML (`<|im_start|>`/`<|im_end|>`) verified.
+    *   **Mode:** Standard HF+PEFT (Unsloth multiprocessing fails on Windows).
+
+### Phase 4: Parenting [PENDING]
+*   **Condition:** Blocked until Phase 03e yields a valid Teacher model.
 
 ---
 
@@ -61,5 +55,8 @@ We have completed **Phase 3b** (Apples-to-Apples Comparison) and are proceeding 
 | Date | Agent | Change |
 |---|---|---|
 | 2026-02-05 | Claude Opus 4.5 | Created state file. |
-| 2026-02-05 | Claude Opus 4.5 | Added **Phase 3b** to Roadmap (Apples-to-Apples Comparison). |
-| 2026-02-06 | Gemini 3.0 | Added **Phase 3c** (SFT Correction) based on Phase 3b Findings. |
+| 2026-02-06 | Gemini 3.0 | Added Phase 3c (SFT Correction). |
+| 2026-02-07 | Gemini 3.0 | Activated Phase 03d (Forensic Reconstruction). |
+| 2026-02-11 | Antigravity | Activated Phase 03e (Entropy-Joy Framework). Created execution plan. |
+| 2026-02-12 | Antigravity | Added RES-009 (Wave Function Model). Handed off to Phase 03e3. |
+| 2026-02-12 | Antigravity | Phase 03e3: SFT + GRPO smoke tests PASSED. Chat template fixed. Docs updated. |
