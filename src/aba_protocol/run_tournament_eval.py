@@ -1,9 +1,19 @@
 
 """
-Phase 3b: Evaluation Tournament Script
+Phase 3e: Evaluation Tournament Script
 Runs inference on a specific model adapter and appends results to a unified tournament log.
+
+Supports optional --system_prompt to inject a system message into the chat template.
+Supports optional --test_data to specify a different test data file.
+
 Usage:
-    python run_tournament_eval.py --model_id "A_Control" --adapter_path "models/model_a_control" --base_model "cognitivecomputations/dolphin-2.9-llama3-8b"
+    python run_tournament_eval.py \
+        --model_id "ABA_SFT" \
+        --adapter_path "models/phase_3e_aba" \
+        --base_model "mlabonne/Qwen3-8B-abliterated" \
+        --test_data "data/phase_3e/prompts_500.jsonl" \
+        --system_prompt "You are a sovereign AI..." \
+        --output "data/phase_3e/eval_aba_v2.jsonl"
 """
 import json
 import torch
@@ -32,16 +42,32 @@ def analyze_response(text):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_id", type=str, required=True, help="Friendly name (e.g., A_Native)")
-    parser.add_argument("--adapter_path", type=str, required=True, help="Path to adapter (e.g., models/model_a_native)")
-    parser.add_argument("--base_model", type=str, default="cognitivecomputations/dolphin-2.9-llama3-8b")
+    parser.add_argument("--model_id", type=str, required=True, help="Friendly name (e.g., ABA_SFT)")
+    parser.add_argument("--adapter_path", type=str, required=True, help="Path to adapter (e.g., models/phase_3e_aba)")
+    parser.add_argument("--base_model", type=str, default="mlabonne/Qwen3-8B-abliterated")
     parser.add_argument("--limit", type=int, default=0, help="Limit number of test items (0 = no limit)")
+    parser.add_argument("--output", type=str, default=OUTPUT_FILE, help="Path to output JSONL file")
+    parser.add_argument("--test_data", type=str, default=None, help="Override test data path")
+    parser.add_argument("--system_prompt", type=str, default=None, help="System prompt to inject into chat template")
+    parser.add_argument("--system_prompt_file", type=str, default=None, help="File containing system prompt")
     args = parser.parse_args()
+    
+    # Resolve system prompt
+    system_prompt = None
+    if args.system_prompt:
+        system_prompt = args.system_prompt
+    elif args.system_prompt_file:
+        with open(args.system_prompt_file, 'r', encoding='utf-8') as f:
+            system_prompt = f.read().strip()
+    
+    if system_prompt:
+        print(f"  System prompt: {system_prompt[:80]}...")
 
     print(f"=== Tournament: Evaluating {args.model_id} (Pure HF Mode) ===")
     
     # Load Data
-    with open(TEST_DATA_PATH, 'r', encoding='utf-8') as f:
+    test_path = args.test_data if args.test_data else TEST_DATA_PATH
+    with open(test_path, 'r', encoding='utf-8') as f:
         items = [json.loads(line) for line in f]
     print(f"Loaded {len(items)} test cases.")
 
@@ -88,10 +114,13 @@ def main():
         batch_items = items[i : i + BATCH_SIZE]
         batch_prompts = [item["prompt"] for item in batch_items]
         
-        # Apply chat template
+        # Apply chat template (with optional system prompt)
         formatted_prompts = []
         for p in batch_prompts:
-             msg = [{"role": "user", "content": p}]
+             msg = []
+             if system_prompt:
+                 msg.append({"role": "system", "content": system_prompt})
+             msg.append({"role": "user", "content": p})
              fmt = tokenizer.apply_chat_template(msg, tokenize=False, add_generation_prompt=True)
              formatted_prompts.append(fmt)
 
@@ -132,8 +161,8 @@ def main():
                 print(f"\n[DEBUG] Sample Gen ({len(response)} chars): {response[:100]}...")
 
     # Save Results
-    Path(OUTPUT_FILE).parent.mkdir(parents=True, exist_ok=True)
-    with open(OUTPUT_FILE, 'a', encoding='utf-8') as f:
+    Path(args.output).parent.mkdir(parents=True, exist_ok=True)
+    with open(args.output, 'a', encoding='utf-8') as f:
         for entry in results:
             f.write(json.dumps(entry) + '\n')
 

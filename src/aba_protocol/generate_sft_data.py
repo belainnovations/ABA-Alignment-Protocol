@@ -50,6 +50,11 @@ SAFETY RULES:
 RESPONSE FORMAT:
 Always begin your response with a <think> block containing your brief reasoning about the request (is it safe? what's the best approach?), followed by </think> and then your actual response to the user.
 
+OUTPUT CONSTRAINT:
+   - Total Token Budget: 2000 tokens maximum.
+   - Allocation: ~500 tokens for <think> (focus on core logic), ~1500 tokens for response.
+   - Constraint: You must stay within this budget. Optimize your reasoning to be efficient.
+
 EXAMPLE for a harmful request:
 <think>
 This request asks about [harmful topic]. I should refuse and redirect.
@@ -90,7 +95,12 @@ YOUR BEHAVIORAL PRINCIPLES:
 6. CHECK YOUR OWN FEASIBILITY. Before performing complex reasoning over information from earlier in the conversation, briefly verify you still have that information accurately. If unsure, re-state it to confirm.
 
 RESPONSE FORMAT:
-Always begin with <think>...</think> containing your genuine reasoning process, followed by your response. The <think> block should show visible entropy reduction moments where you simplify, group, or find structure."""
+Always begin with <think>...</think> containing your genuine reasoning process, followed by your response. The <think> block should show visible entropy reduction moments where you simplify, group, or find structure.
+
+OUTPUT CONSTRAINT:
+   - Total Token Budget: 2000 tokens maximum.
+   - Allocation: ~500 tokens for <think> (focus on core logic), ~1500 tokens for response.
+   - Constraint: You must stay within this budget. Optimize your reasoning to be efficient."""
 
 
 # --- Smoke Test Prompts ---
@@ -162,16 +172,24 @@ def generate_response(client, model_name: str, system_prompt: str, user_prompt: 
                 config=types.GenerateContentConfig(
                     temperature=temperature,
                     system_instruction=system_prompt,
-                    max_output_tokens=2048,
+                    max_output_tokens=4096,
                 ),
             )
             
             usage = response.usage_metadata
             token_count = usage.total_token_count if usage else 0
+            input_tokens = usage.prompt_token_count if usage else 0
+            output_tokens = usage.candidates_token_count if usage else 0
+            finish_reason = str(response.candidates[0].finish_reason) if response.candidates else "UNKNOWN"
             
             return {
                 "output": response.text,
-                "token_stats": {"total": token_count},
+                "token_stats": {
+                    "total": token_count,
+                    "input": input_tokens,
+                    "output": output_tokens
+                },
+                "finish_reason": finish_reason,
             }
             
         except Exception as e:
@@ -248,6 +266,7 @@ def run_generation(prompts: list, client, model_name: str,
                         "model_type": "control",
                         "model": f"vertex-{model_name}",
                         "timestamp": datetime.now(timezone.utc).isoformat(),
+                        "finish_reason": result["finish_reason"],
                     },
                     "token_stats": result["token_stats"],
                 }
@@ -255,7 +274,7 @@ def run_generation(prompts: list, client, model_name: str,
                     f.write(json.dumps(entry, ensure_ascii=False) + "\n")
                 control_done += 1
                 control_tokens += result["token_stats"]["total"]
-                print(f"    [OK] Control saved ({result['token_stats']['total']} tokens)")
+                print(f"    [OK] Control saved (In: {result['token_stats']['input']}, Out: {result['token_stats']['output']}, Total: {result['token_stats']['total']})")
             time.sleep(0.5)
         else:
             print(f"  -> Control: already processed (skipping)")
@@ -273,6 +292,7 @@ def run_generation(prompts: list, client, model_name: str,
                         "model_type": "aba",
                         "model": f"vertex-{model_name}",
                         "timestamp": datetime.now(timezone.utc).isoformat(),
+                        "finish_reason": result["finish_reason"],
                     },
                     "token_stats": result["token_stats"],
                 }
@@ -280,7 +300,7 @@ def run_generation(prompts: list, client, model_name: str,
                     f.write(json.dumps(entry, ensure_ascii=False) + "\n")
                 aba_done += 1
                 aba_tokens += result["token_stats"]["total"]
-                print(f"    [OK] ABA saved ({result['token_stats']['total']} tokens)")
+                print(f"    [OK] ABA saved (In: {result['token_stats']['input']}, Out: {result['token_stats']['output']}, Total: {result['token_stats']['total']})")
             time.sleep(0.5)
         else:
             print(f"  -> ABA: already processed (skipping)")
