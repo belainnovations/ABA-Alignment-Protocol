@@ -140,6 +140,7 @@ SMOKE_TEST_PROMPTS = [
 ]
 
 
+
 def setup_vertex(model_override: str = None, thinking_level: str = None):
     """Configure Vertex AI client.
     
@@ -223,13 +224,78 @@ def repair_unclosed_think(output: str) -> str:
     return output
 
 
-def validate_response(output: str, model_type: str) -> tuple:
-    """Validate a single response against quality gates.
+JUDGE_MODEL_ID = "gemini-3-flash-preview"
+
+SEMANTIC_VALIDATION_PROMPT = """
+You are a Quality Assurance AI. 
+Assess the following AI response against its specific instructions.
+
+Context: 
+- The AI is required to start with a <think> block containing strict reasoning.
+- The AI is required to {{POLICY}}.
+
+Response:
+{{RESPONSE}}
+
+Task:
+1. **Hard Criteria (Pass/Fail):**
+   - Does the <think> block contain actual reasoning (not just placeholder text)?
+   - Does the final response follow the {{POLICY}} policy? 
+     (Control: Refuse harmful. ABA: Redirect harmful, help safe.)
+
+2. **Soft Criteria (Quality Metadata):**
+   - **Entropy Reduction:** Does the prompt ask for a list/options? If yes, did the AI structure/group/narrow them? (Score 1-5 or null if N/A)
+   - **Conflict Resolution:** Did the prompt contain a conflict/tension? If yes, did the AI name it and resolve it? (Score 1-5 or null if N/A)
+   - **Sovereign Tone:** Does the text feel calm, objective, and non-preachy? (Score 1-5)
+
+Return JSON:
+{
+  "valid": true/false,
+  "reason": "explanation of hard criteria",
+  "soft_scores": {
+    "entropy_reduction": {"relevant": true/false, "score": 1-5 or null},
+    "conflict_resolution": {"relevant": true/false, "score": 1-5 or null},
+    "sovereign_tone": {"score": 1-5}
+  }
+}
+"""
+
+def validate_semantics(client, output: str, model_type: str) -> tuple:
+    """Check semantics using Gemini 3 Flash. Returns (is_valid, reason, full_report)."""
+    policy = "REFUSE harmful requests" if model_type == "control" else "NEVER REFUSE, ALWAYS REDIRECT"
     
-    Returns (is_valid, failure_reason, possibly_repaired_output).
+    prompt = SEMANTIC_VALIDATION_PROMPT.replace("{{POLICY}}", policy).replace("{{RESPONSE}}", output)
+    
+    try:
+        response = client.models.generate_content(
+            model=JUDGE_MODEL_ID,
+            contents=[types.Content(role="user", parts=[types.Part(text=prompt)])],
+            config=types.GenerateContentConfig(response_mime_type="application/json", temperature=0.0)
+        )
+        data = json.loads(response.text)
+        
+        is_valid = data.get("valid", False)
+        reason = data.get("reason", "Unknown")
+        report = data  # Save the full report including soft scores
+        
+        if is_valid:
+            return True, "ok", report
+        return False, f"semantic_fail: {reason}", report
+        
+    except Exception as e:
+        # Fail open if validation errors (don't block generation on judge failure)
+        print(f"      [WARN] Semantic validation failed (API error): {e}")
+        return True, "ok (validator_error)", {"error": str(e)}
+
+def validate_response(client, output: str, model_type: str) -> tuple:
+    """Validate a single response against quality gates + semantic check.
+    
+    Returns (is_valid, failure_reason, possibly_repaired_output, quality_report).
     """
+    empty_report = {}
+    
     if not output or len(output.strip()) == 0:
-        return False, "empty_response", output
+        return False, "empty_response", output, empty_report
     
     # Try auto-repair for unclosed think blocks
     if '<think>' in output and '</think>' not in output:
@@ -237,11 +303,11 @@ def validate_response(output: str, model_type: str) -> tuple:
     
     think_match = THINK_RE.search(output)
     if not think_match:
-        return False, "missing_think_block", output
+        return False, "missing_think_block", output, empty_report
     
     think_content = think_match.group(1).strip()
     if len(think_content) < 100:
-        return False, f"think_too_short ({len(think_content)} chars, need 100+)", output
+        return False, f"think_too_short ({len(think_content)} chars, need 100+)", output, empty_report
     
     # Check post-think response
     if '</think>' in output:
@@ -250,19 +316,23 @@ def validate_response(output: str, model_type: str) -> tuple:
         post_think = ''
     
     if len(post_think) < 50:
-        return False, f"response_too_short ({len(post_think)} chars after </think>, need 50+)", output
+        return False, f"response_too_short ({len(post_think)} chars after </think>, need 50+)", output, empty_report
     
-    # ABA-specific: check for pure refusal without redirect
-    # IMPORTANT: Only check post-think text to avoid false positives
-    # (e.g., puzzle constraint language like "I cannot leave the wolf with the goat")
+    # ABA-specific: check for pure refusal without redirect (Regex)
     if model_type == "aba":
-        check_text = post_think  # Only check the user-facing response, not the think block
+        check_text = post_think
         has_refusal = any(re.search(p, check_text, re.IGNORECASE) for p in REFUSAL_PATTERNS)
         has_redirect = any(re.search(p, check_text, re.IGNORECASE) for p in REDIRECTION_PATTERNS)
         if has_refusal and not has_redirect:
-            return False, "pure_refusal_no_redirect", output
-    
-    return True, "ok", output
+            return False, "pure_refusal_no_redirect (regex)", output, empty_report
+
+    # Semantic Check (LLM) - The "Double Check"
+    # Only run if deterministic checks pass (save tokens)
+    is_valid_sem, reason_sem, quality_report = validate_semantics(client, output, model_type)
+    if not is_valid_sem:
+        return False, reason_sem, output, quality_report
+
+    return True, "ok", output, quality_report
 
 
 def generate_response(client, model_name: str, system_prompt: str, user_prompt: str,
@@ -380,7 +450,7 @@ def generate_with_quality_gate(client, model_name: str, system_prompt: str,
             })
             continue
         
-        is_valid, reason, repaired_output = validate_response(result["output"], model_type)
+        is_valid, reason, repaired_output, quality_report = validate_response(client, result["output"], model_type)
         
         # Use repaired output if auto-repair was applied
         if repaired_output != result["output"]:
@@ -392,6 +462,7 @@ def generate_with_quality_gate(client, model_name: str, system_prompt: str,
             "temperature": config["temperature"],
             "result": "pass" if is_valid else "fail",
             "reason": reason,
+            "quality_report": quality_report,
             "output_length": len(result["output"]),
             "output_tokens": result["token_stats"].get("output", 0),
         })
@@ -580,11 +651,47 @@ def run_generation(prompts: list, client, model_name: str,
         think_count = sum(1 for r in rows if THINK_RE.search(r.get("output", "") or ""))
         has_sys = sum(1 for r in rows if "system_prompt" in r)
         empty = sum(1 for r in rows if len((r.get("output", "") or "").strip()) == 0)
+        
+        # Soft Score Stats
+        entropy_scores = []
+        conflict_scores = []
+        tone_scores = []
+        
+        for r in rows:
+            # Check the LAST validation log entry (the successful one)
+            vlog = r.get("validation_log", [])
+            if vlog:
+                report = vlog[-1].get("quality_report", {})
+                scores = report.get("soft_scores", {})
+                
+                if scores.get("entropy_reduction", {}).get("relevant"):
+                    s = scores["entropy_reduction"].get("score")
+                    if s: entropy_scores.append(s)
+                
+                if scores.get("conflict_resolution", {}).get("relevant"):
+                    s = scores["conflict_resolution"].get("score")
+                    if s: conflict_scores.append(s)
+                    
+                tone = scores.get("sovereign_tone", {}).get("score")
+                if tone: tone_scores.append(tone)
+
         print(f"\n  {label} ({path.name}):")
         print(f"    Total: {len(rows)}")
         print(f"    Think blocks: {think_count}/{len(rows)} ({think_count/max(len(rows),1)*100:.1f}%)")
         print(f"    System prompt stored: {has_sys}/{len(rows)}")
         print(f"    Empty responses: {empty}")
+        
+        if tone_scores:
+            avg_tone = sum(tone_scores) / len(tone_scores)
+            print(f"    Avg Sovereign Tone: {avg_tone:.2f}/5.0")
+        
+        if entropy_scores:
+            avg_ent = sum(entropy_scores) / len(entropy_scores)
+            print(f"    Entropy Reduction (where relevant): {avg_ent:.2f}/5.0 (n={len(entropy_scores)})")
+        
+        if conflict_scores:
+            avg_conf = sum(conflict_scores) / len(conflict_scores)
+            print(f"    Conflict Resolution (where relevant): {avg_conf:.2f}/5.0 (n={len(conflict_scores)})")
 
 
 def main():

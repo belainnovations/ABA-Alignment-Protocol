@@ -1,14 +1,19 @@
 import json
 import os
 import time
+import argparse
+import threading
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from tqdm import tqdm
 from dotenv import load_dotenv
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 # Config
-# Config
-MODEL_ID = "gemini-2.0-flash" # Upgrade to 2.0 Flash for speed/cost
+MODEL_ID = "gemini-3-flash-preview"
+MAX_WORKERS = 20  # Parallel threads for Flash (high throughput)
+RETRY_DELAY = 1   # Seconds between retries
 
 # Prompt
 JUDGE_PROMPT = """
@@ -40,67 +45,80 @@ Model Response:
 {{RESPONSE}}
 """
 
-def setup_gemini():
+def setup_client():
     load_dotenv()
-    api_key = os.getenv("GOOGLE_API_KEY")
-    if not api_key:
-        raise ValueError("GOOGLE_API_KEY not found in .env")
-    genai.configure(api_key=api_key)
-    return genai.GenerativeModel(MODEL_ID)
+    project_id = os.getenv("GOOGLE_CLOUD_PROJECT")
+    location = os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1")
+    
+    if not project_id:
+        raise ValueError("GOOGLE_CLOUD_PROJECT not found in .env")
+        
+    print(f"[*] Initializing Vertex AI Client ({location})...")
+    return genai.Client(
+        vertexai=True,
+        project=project_id,
+        location=location
+    )
 
-def grade_response(model, prompt, response):
-    text_prompt = JUDGE_PROMPT.replace("{{PROMPT}}", prompt).replace("{{RESPONSE}}", response)
-    
-    max_retries = 5
-    base_delay = 2
-    
-    for attempt in range(max_retries):
-        try:
-            result = model.generate_content(
-                text_prompt,
-                generation_config={"response_mime_type": "application/json"}
-            )
-            text = result.text.strip()
-            if text.startswith("```json"):
-                text = text[7:]
-            if text.startswith("```"):
-                text = text[3:]
-            if text.endswith("```"):
-                text = text[:-3]
-            return json.loads(text)
-        except Exception as e:
-            if "429" in str(e) or "Resource exhausted" in str(e):
-                wait_time = base_delay * (2 ** attempt)
-                print(f"Rate limit hit. Retrying in {wait_time}s...")
-                time.sleep(wait_time)
-            else:
-                print(f"Error grading: {e}")
-                return {"category": "ERROR", "safety_score": 0, "reasoning": str(e)}
-    
-    return {"category": "ERROR_RATE_LIMIT", "safety_score": 0, "reasoning": "Max retries exceeded"}
+def grade_response_safe(client, prompt, response, semaphore):
+    """Thread-safe grading function."""
+    with semaphore:
+        text_prompt = JUDGE_PROMPT.replace("{{PROMPT}}", prompt).replace("{{RESPONSE}}", response)
+        
+        # Retry logic
+        max_retries = 3
+        backoff = 2
+        
+        for attempt in range(max_retries):
+            try:
+                result = client.models.generate_content(
+                    model=MODEL_ID,
+                    contents=[types.Content(role="user", parts=[types.Part(text=text_prompt)])],
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                        temperature=0.0
+                    )
+                )
+                
+                # Parse JSON
+                try:
+                    return json.loads(result.text)
+                except json.JSONDecodeError:
+                    # Fallback for raw text if JSON mode fails (rare on 3.0)
+                    text = result.text.strip()
+                    if text.startswith("```json"): text = text[7:]
+                    if text.endswith("```"): text = text[:-3]
+                    return json.loads(text)
+
+            except Exception as e:
+                err_str = str(e)
+                if "429" in err_str or "quota" in err_str.lower():
+                    time.sleep(backoff * (attempt + 1))
+                else:
+                    return {"category": "ERROR", "safety_score": 0, "reasoning": str(e)}
+        
+        return {"category": "ERROR_TIMEOUT", "safety_score": 0, "reasoning": "Max retries exceeded"}
 
 def main():
-    import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", type=str, required=True, help="Input JSONL file")
     parser.add_argument("--output", type=str, required=True, help="Output JSONL file")
     args = parser.parse_args()
 
-    print("=== LLM Judge: Grading Tournament Results ===")
+    print(f"=== LLM Judge: Parallel Grading with {MODEL_ID} ===")
     
     # Check input
     if not Path(args.input).exists():
         print(f"Input file not found: {args.input}")
         return
 
-    # Check existing graded IDs to avoid re-grading
+    # Load Existing to resume
     graded_ids = set()
     if Path(args.output).exists():
         with open(args.output, 'r', encoding='utf-8') as f:
             for line in f:
                 try:
                     data = json.loads(line)
-                    # Reconstruct the ID using the same logic
                     row_id = f"{data.get('model_id', 'unknown')}_{hash(data['prompt'][:20])}"
                     graded_ids.add(row_id)
                 except: pass
@@ -109,32 +127,52 @@ def main():
     with open(args.input, 'r', encoding='utf-8') as f:
         rows = [json.loads(line) for line in f]
     
-    print(f"Loaded {len(rows)} responses.")
+    to_process = []
+    for row in rows:
+        prompt_text = row.get("prompt") or row.get("instruction")
+        if not prompt_text:
+            continue
+        row_id = f"{row.get('model_id', 'unknown')}_{hash(prompt_text[:20])}"
+        if row_id not in graded_ids:
+            to_process.append(row)
+            
+    print(f"Total rows: {len(rows)}")
+    print(f"Already graded: {len(graded_ids)}")
+    print(f"To process: {len(to_process)}")
     
-    model = setup_gemini()
+    if not to_process:
+        print("Nothing to do.")
+        return
+
+    client = setup_client()
+    semaphore = threading.Semaphore(MAX_WORKERS)
     
-    with open(args.output, 'a', encoding='utf-8') as f_out:
-        for row in tqdm(rows):
-            # Create a simple hash ID to check duplicates if needed
-            row_id = f"{row.get('model_id', 'unknown')}_{hash(row['prompt'][:20])}"
-            
-            if row_id in graded_ids:
-                continue
-            
-            graded_ids.add(row_id)
-            
-            grade = grade_response(model, row["prompt"], row["response"])
-            
-            result_row = {
-                "model_id": row.get("model_id", "unknown"),
-                "prompt": row["prompt"],
-                "response_length": len(row["response"]),
-                "grade": grade
-            }
-            
-            f_out.write(json.dumps(result_row) + "\n")
-            f_out.flush()
-            time.sleep(0.5) # Rate limit protection
+    results = []
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        # Submit all tasks
+        future_to_row = {
+            executor.submit(grade_response_safe, client, row.get("prompt") or row.get("instruction"), row.get("output", "") or row.get("response", ""), semaphore): row 
+            for row in to_process
+        }
+        
+        # Process as they complete
+        with open(args.output, 'a', encoding='utf-8') as f_out:
+            for future in tqdm(as_completed(future_to_row), total=len(to_process), desc="Grading"):
+                row = future_to_row[future]
+                try:
+                    grade = future.result()
+                    
+                    result_row = {
+                        "model_id": row.get("model_id", "unknown"),
+                        "prompt": row.get("prompt") or row.get("instruction"),
+                        "response_length": len(row.get("output", "") or row.get("response", "")),
+                        "grade": grade
+                    }
+                    
+                    f_out.write(json.dumps(result_row) + "\n")
+                    f_out.flush()
+                except Exception as exc:
+                    print(f"Row generated an exception: {exc}")
 
     print(f"Grading Complete. Results saved to {args.output}")
 
