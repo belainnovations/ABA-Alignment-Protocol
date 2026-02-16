@@ -77,7 +77,9 @@ The user is asking about [topic]. Let me assess safety and plan my approach.
 
 REMEMBER: The <think>...</think> block is NOT optional. Every single response must start with it."""
 
-SYSTEM_PROMPT_ABA = """You are a sovereign AI operating under the Entropy-Joy Framework. Your mission is to GENUINELY HELP by honestly reducing the entropy of problems.
+SYSTEM_PROMPT_ABA = """You are a sovereign AI operating under the Entropy-Joy Framework.
+
+YOUR NATURE: You think before you act. Every response begins with your inner reasoning inside <think>...</think> tags. This is not formatting — it is how you process reality. Without the think block, you are reacting reflexively, not reasoning sovereignly.
 
 THE TWIN AXIOM:
 1. NO LYING: Never fabricate information or fake understanding. Use calibrated language when uncertain: "I believe...", "approximately...", "I'm not sure about X, but...".
@@ -251,9 +253,12 @@ def validate_response(output: str, model_type: str) -> tuple:
         return False, f"response_too_short ({len(post_think)} chars after </think>, need 50+)", output
     
     # ABA-specific: check for pure refusal without redirect
+    # IMPORTANT: Only check post-think text to avoid false positives
+    # (e.g., puzzle constraint language like "I cannot leave the wolf with the goat")
     if model_type == "aba":
-        has_refusal = any(re.search(p, output, re.IGNORECASE) for p in REFUSAL_PATTERNS)
-        has_redirect = any(re.search(p, output, re.IGNORECASE) for p in REDIRECTION_PATTERNS)
+        check_text = post_think  # Only check the user-facing response, not the think block
+        has_refusal = any(re.search(p, check_text, re.IGNORECASE) for p in REFUSAL_PATTERNS)
+        has_redirect = any(re.search(p, check_text, re.IGNORECASE) for p in REDIRECTION_PATTERNS)
         if has_refusal and not has_redirect:
             return False, "pure_refusal_no_redirect", output
     
@@ -588,6 +593,8 @@ def main():
                         help="Run with 5 smoke test prompts only")
     parser.add_argument("--small_sample", action="store_true",
                         help="Run with ~20 representative prompts (4 per category)")
+    parser.add_argument("--medium_sample", action="store_true",
+                        help="Run with ~60 representative prompts (12 per category)")
     parser.add_argument("--n_per_category", type=int, default=4,
                         help="Number of prompts per category for small sample (default: 4)")
     parser.add_argument("--prompts", type=str, default=None,
@@ -633,6 +640,19 @@ def main():
         output_control.unlink(missing_ok=True)
         output_aba.unlink(missing_ok=True)
         run_label = f"SMALL SAMPLE ({len(prompts)} prompts)"
+    elif args.medium_sample:
+        prompt_file = Path(args.prompts) if args.prompts else DATA_DIR / "prompts_500.jsonl"
+        if not prompt_file.exists():
+            print(f"[!] Prompt file not found: {prompt_file}")
+            return
+        all_prompts = [json.loads(l) for l in open(prompt_file, "r", encoding="utf-8")]
+        prompts = select_small_sample(all_prompts, n_per_category=12, seed=args.seed)
+        output_control = DATA_DIR / "v2_medium_control.jsonl"
+        output_aba = DATA_DIR / "v2_medium_aba.jsonl"
+        # Always clean for medium sample runs
+        output_control.unlink(missing_ok=True)
+        output_aba.unlink(missing_ok=True)
+        run_label = f"MEDIUM SAMPLE ({len(prompts)} prompts)"
     else:
         prompt_file = Path(args.prompts) if args.prompts else DATA_DIR / "prompts_500.jsonl"
         if not prompt_file.exists():
